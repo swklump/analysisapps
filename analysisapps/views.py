@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 email_master = 'sam.klump@outlook.com'
 email_href = 'mailto:' + email_master
-
+# test change
 ### HOME PAGE
 @csrf_exempt
 def home(request):
