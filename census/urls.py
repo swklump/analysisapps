@@ -4,11 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', views.census, name='WebApp-census'),
-    path('parse/', views.parse, name='WebApp-census-parse'),
+    path('', views.census, name='census'),
+    path('parse/', views.parse, name='parse'),
     path('parse/tableids/', views.parse_tableids, name='parse-tableids'),
-    path('descriptive-analysis/', views.descriptiveanalysis, name='descriptiveanalysis'),
-    path('advanced-analysis/', views.advancedanalysis, name='advancedanalysis'),
+    path('descriptiveanalysis/', views.descriptiveanalysis, name='descriptiveanalysis'),
+    path('advancedanalysis/', views.advancedanalysis, name='advancedanalysis'),
 ]
 
 if settings.DEBUG:

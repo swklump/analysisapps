@@ -18,7 +18,7 @@
           <h4 class="font-weight-light">Module 2. Analyze Data</h4>
           <li>Step 1:</li>
           Upload a zipped folder of parsed Excel files from
-          <a href="{% url 'WebApp-census-parse' %}">Module 1. Parse Data</a>.
+          <a href="{% url 'parse' %}">Module 1. Parse Data</a>.
     
           <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -120,7 +120,7 @@
             <div class="card-body">
               <h4 class="card-title">Overview</h5>
               <p class="card-text">This module inputs a zipped folder of parsed Census Excel files (outputted
-                from the <a href="{% url 'WebApp-census-parse' %}">Parse Census Data</a> module)
+                from the <a href="{% url 'parse' %}">Parse Census Data</a> module)
                 and outputs a single Excel file with data tabulated from each parsed file.
                 The module can also compute percentages and percentage ranks of selected
                 characteristics (e.g., % elderly, % low income, etc.), correlation

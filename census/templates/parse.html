@@ -19,7 +19,7 @@
           <h4 class="font-weight-light">Module 1. Parse Data</h4>
           <li>Step 1:</li>
           Download table files from the Census website with one or more of the table
-          IDs shown <a href="{% url 'WebApp-census-parse-tableids' %}">here</a>.
+          IDs shown <a href="{% url 'parse-tableids' %}">here</a>.
           Download a table with the geography set as by tract or blockgroup and
           download the file in Excel format.
           <p></p>
@@ -45,7 +45,7 @@
               <h4 class="card-title">Overview</h5>
               <p class="card-text">This module restructures the format of Excel data tables from the Census
                 website to be more easily analyzed (either by the analyst or using the
-                <a href="{% url 'WebApp-census-descriptiveanalysis' %}">Analyze Census Data</a>
+                <a href="{% url 'descriptiveanalysis' %}">Analyze Census Data</a>
                 module). This module reformats the tables to have the Census tract or
                 block group as rows (instead of as individual columns) and the
                 characteristic variables and associated estimates as corresponding rows

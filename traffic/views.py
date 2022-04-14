@@ -3,9 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import StreamingHttpResponse
 from django.contrib import messages
 
-from functions.aktrafficvolume.akdata_main import akdata_script
-from functions.ihsdm.ihsdm_parse_main import ihsdm_parse_func
-from functions.tam.tam import tam_func
+from .functions.aktrafficvolume.akdata_main import akdata_script
+from .functions.ihsdm.ihsdm_parse_main import ihsdm_parse_func
+from .functions.tam.tam import tam_func
 
 import zipfile, xlrd, io
 from bs4 import BeautifulSoup as bs
@@ -20,6 +20,10 @@ import textwrap
 
 email_master = 'sam.klump@outlook.com'
 email_href = 'mailto:' + email_master
+
+@csrf_exempt
+def traffic(request):
+    return render(request, 'traffic.html', context={'email':email_master, 'email_link':email_href})
 
 @csrf_exempt
 def aktrafficdata(request):

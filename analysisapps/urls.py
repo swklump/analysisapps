@@ -7,8 +7,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='WebApp-home'),
-    path('about/', views.about, name='WebApp-about'),
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('powerbi/', views.powerbi, name='powerbi'),
     path('census/', include('census.urls')),
     path('traffic/', include('traffic.urls')),
 ]
