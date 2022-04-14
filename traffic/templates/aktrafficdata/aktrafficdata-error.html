@@ -1,0 +1,36 @@
+{% extends "_base.html" %} {% load static %} {% block content %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row align-items-center my-5">
+        <div class="col-6">
+          <p></p>
+          <h2 class="font-weight-light">AKDOT Traffic Data Compiler App - Error</h2>
+          <p></p>
+          <div>
+            {% if messages %}
+              {% for message in messages %}
+              <divclass = "alertalert-{{message.tags}}">
+            <h6 style="color:red">{{message}}</h6>
+              </div>
+              {% endfor %}
+              {% endif %}
+            <p></p>
+            Click <a href="{% url 'WebApp-traffic-aktrafficdata' %}">here</a> to return to the module, or click the "back"
+            button on your internet browser to retain your previous inputs.
+            <p></p>
+            For questions, comments, or suggestions for improvement on the apps, please email Sam Klump at
+            <a href="mailto:sam.klump@outlook.com">sam.klump@outlook.com</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+{% endblock content %}

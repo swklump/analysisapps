@@ -1,0 +1,146 @@
+{% extends "_base.html" %} {% load static %} {% block content %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row align-items-top my-5">
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <p></p>
+          <h2 class="font-weight-light">Census Data App</h2>
+          This application parses and analyzes data from the US Census Bureau
+          website.
+          <p></p>
+          <h4 class="font-weight-light">Module 2. Analyze Data</h4>
+          <li>Step 1:</li>
+          Upload a zipped folder of parsed Excel files from
+          <a href="{% url 'WebApp-census-parse' %}">Module 1. Parse Data</a>.
+    
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="file" class="form-control form-control-sm" id="zip_file" name="zip_file" required/>
+            <p></p>
+            <p>
+              <!-- Select state entry -->
+              <li>Step 2:</li>
+              Select options for defining categories (if applicable).
+            </p>
+    
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-6">
+                <i>Elderly persons (DP05 or B01001)</i><br/>
+                <select class="form-select form-select-sm" name="old" id="old">
+                  <option value="dontinclude">Do not include</option>
+                  <option value="60yr">60 years or older</option>
+                  <option value="65yr" selected>65 years or older</option>
+                  <option value="75yr">75 years or older</option>
+                </select>
+                <p></p>
+    
+                <i>Non-drivers (S0801 or B08134)</i><br />
+                <select class="form-select form-select-sm" name="nondriver" id="nondriver">
+                  <option value="dontinclude">Do not include</option>
+                  <option value="nondriver" selected>Non drivers only</option>
+                  <option value="carpool">Non drivers and carpoolers</option>
+                </select>
+                <p></p>
+    
+                <i>Low housing value (DP04 or B25075)</i><br />
+                <select class="form-select form-select-sm" name="housevalue" id="housevalue">
+                  <option value="dontinclude">Do not include</option>
+                  <option value="100k">Less than $100k</option>
+                  <option value="50k" selected>Less than $50k</option>
+                </select>
+              </div>
+    
+              <div class="col-xs-12 col-sm-12 col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="poc" name="poc" checked>
+                  <label class="form-check-label" for="flexCheckDefault">People of color (DP05 or B03002)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="lowincome" name="lowincome" checked>
+                  <label class="form-check-label" for="flexCheckDefault">Low income (<2x poverty line) (S1701 or C17002)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="edu" name="edu" checked>
+                  <label class="form-check-label" for="flexCheckDefault">Less than high school diploma (S1501 or B15002)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="renter" name="renter" checked>
+                  <label class="form-check-label" for="flexCheckDefault">Renter (DP04 or B25003)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="disab" name="disab" checked>
+                  <label class="form-check-label" for="flexCheckDefault">Disabled (S1810 or C21007)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="lead" name="lead" checked>
+                  <label class="form-check-label" for="flexCheckDefault">Lead paint indicator (pre-1960's housing) (B25034)</label>
+                </div>
+              </div>
+            </div>
+            <p></p>
+    
+            <li>Step 3:</li>
+            Select calculations to include.<br />
+            
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="perc" name="perc" checked>
+              <label class="form-check-label" for="flexCheckDefault">Percentages</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="percrank" name="percrank" checked>
+              <label class="form-check-label" for="flexCheckDefault">Percentage Ranks</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="summ" name="summ" checked>
+              <label class="form-check-label" for="flexCheckDefault">Descriptive Statistical Summary</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="matrix" name="matrix" checked>
+              <label class="form-check-label" for="flexCheckDefault">Correlation Matrix (requires at least two parsed files)</label>
+            </div>
+            <p></p>
+            <button class="btn btn-primary" type="submit">Submit</button>
+            <p></p>
+            After clicking the "Submit" button, a zipped folder named "census_analysis_files.zip" will appear in the "Downloads"
+            folder on your computer.
+          </form>
+        </div>
+        
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <br />
+          <div class="card bg-light">
+            <div class="card-body">
+              <h4 class="card-title">Overview</h5>
+              <p class="card-text">This module inputs a zipped folder of parsed Census Excel files (outputted
+                from the <a href="{% url 'WebApp-census-parse' %}">Parse Census Data</a> module)
+                and outputs a single Excel file with data tabulated from each parsed file.
+                The module can also compute percentages and percentage ranks of selected
+                characteristics (e.g., % elderly, % low income, etc.), correlation
+                matrices showing relationships between characteristics (i.e., r-squared
+                values), box plots showing distributions, and other descriptive
+                statistical summaries.
+              </p>
+              <a href="https://www.youtube.com/watch?v=wlV2O8j7TJQ">Click here</a> for a
+          video demonstration of the Census Data App.
+          <p></p>
+          <p class="card-text"><i>For questions on the apps, please email Sam Klump at</i>
+            <a href={{email_link}} class="card-link">{{email}}</a>.
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </body>
+</html>
+
+
+{% endblock content %}

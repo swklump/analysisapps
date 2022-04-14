@@ -1,0 +1,59 @@
+{% extends "_base.html" %} {% load static %} {% block content %}
+<!-- formatting: https://getbootstrap.com/docs/5.1/content/typography/ -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row align-items-top my-5">
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <p></p>
+          <h2 class="font-weight-light">Census Analysis Apps</h2>
+          <p></p>
+          Please click on the app you wish to use below.
+          <p></p>
+          <a class="btn btn-secondary" href="{% url 'WebApp-census-parse' %}">Parse Census Data</a>
+          <a class="btn btn-secondary" href="{% url 'WebApp-census-descriptiveanalysis' %}">Descriptive Analysis</a>
+          <a class="btn btn-secondary" href="{% url 'WebApp-census-advancedanalysis' %}">Advanced Analysis</a>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <br />
+          <div class="card bg-light">
+            <div class="card-body">
+              <h4 class="card-title">Census Analysis Apps</h5>
+                <br>
+              <h6 class="card-subtitle mb-2 text-muted">Parse Data</h6>
+              <p class="card-text">This module restructures the format of Excel data tables from the Census
+                website to be more easily analyzed (either by the analyst or using the
+                <a href="{% url 'WebApp-census-descriptiveanalysis' %}">Analyze Census Data</a>
+                module). This module reformats the tables to have the Census tract or
+                block group as rows (instead of as individual columns) and the
+                characteristic variables and associated estimates as corresponding rows.
+              </p>
+              <h6 class="card-subtitle mb-2 text-muted">Descriptive Analysis</h6>
+              <p class="card-text">This module inputs a zipped folder of parsed Census Excel files (outputted
+                from the <a href="{% url 'WebApp-census-parse' %}">Parse Census Data</a> module)
+                and outputs a single Excel file with data tabulated from each parsed file.
+                The module can also compute percentages and percentage ranks of selected
+                characteristics, correlation matrices showing relationships between characteristics, box plots showing distributions, 
+                and other descriptive statistical summaries.
+              </p>
+              <h6 class="card-subtitle mb-2 text-muted">Advanced Analysis</h6>
+              <p class="card-text">The advanced analysis module pulls data from the Census API and allows users to plot two variables 
+                against each other to analyze relationships. Associated R-squared values and linear regression equations are shown.
+              </p>
+              <p class="card-text"><i>For questions on the apps, please email Sam Klump at</i>
+                <a href={{email_link}} class="card-link">{{email}}</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+{% endblock content %}

@@ -1,0 +1,52 @@
+{% extends "_base.html" %} {% load static %} {% block content %}
+
+<div class="container">
+  <div class="row align-items-top my-5">
+    <div class="col-6">
+      <p></p>
+      <h2 class="font-weight-light">Census Data App</h2>
+      This application parses and analyzes data from the US Census Bureau
+      website.
+      <p></p>
+      <h4 class="font-weight-light">Dashboard</h4>
+      Coming soon. Please check back at this page after Sunday, November 14, 2021.
+      <p></p>
+      This page will contain a dashboard made in Dash <a href="https://plotly.com/dash/">(plotyly.com/dash)</a> for nationwide Census data pulled
+      directly through the Census API.
+      
+      <div> 
+        {{ len_file }}
+      </div>
+
+      <p></p>
+        For questions, comments, or suggestions for improvement on the apps,
+        please email Sam Klump at
+        <a href="mailto:sam.klump@outlook.com">sam.klump@outlook.com</a>.
+    </div>
+
+    <!-- <div class="col-1"></div>
+    <div class="col-5">
+      <br />
+      <h4 class="font-weight-light">Overview</h4>
+      Have you ever dreaded using data files from the US Census website for
+      analysis due to their format and structure?
+      <p></p>
+      This module restructures the format of Excel data tables from the Census
+      website to be more easily analyzed (either by the analyst or using the
+      <a href="{% url 'WebApp-census-descriptiveanalysis' %}"
+        >Analyze Census Data</a
+      >
+      module). This module reformats the tables to have the Census tract or
+      block group as rows (instead of as individual columns) and the
+      characteristic variables and associated estimates as corresponding rows
+      (e.g., male/female, income range, etc). This makes the file much easier to
+      work with, whether by using a pivot table in Excel, connecting to GIS
+      shapefiles, or importing into a Power BI dashboard.
+      <p></p>
+      <p></p>
+      Click <a href="https://www.youtube.com/watch?v=wlV2O8j7TJQ">here</a> for a
+      video demonstration of the Census Data App.
+    </div> -->
+  </div>
+</div>
+{% endblock content %}

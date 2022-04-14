@@ -1,0 +1,57 @@
+{% extends "_base.html" %} {% load static %} {% block content %}
+
+<div class="container">
+  <div class="row align-items-top my-5">
+    <div class="col-lg-6">
+      <p></p>
+      <h2 class="font-weight-light">Facebook Comment Analysis</h2>
+      Coming soon. Please check back at this page after Sunday, November 21, 2021.
+      <p></p>
+      This app organizes and analyzes social media comments copy-pasted from a
+      Facebook post. The app first puts each comment in a row in a spreadsheet
+      with a corresponding commenter, a unique comment ID, and the number of
+      "likes". The app also creates an analysis tab, which includes a table of
+      the most common two words in a row (with the frequency), the most common
+      three words in a row (with the frequency), and the most "liked" comments.
+      <p></p>
+
+      <!--        <i>Step 1. Upload an Excel file of copy-pasted Facebook comments:</i>-->
+
+      <!--    <form method="POST" enctype="multipart/form-data">-->
+      <!--		{% csrf_token %}-->
+
+      <!--		&lt;!&ndash; Select file entry &ndash;&gt;-->
+      <!--        {% csrf_token %}-->
+      <!--            <input type="file"-->
+      <!--                   title="Upload excel file"-->
+      <!--                   name="excel_file"-->
+      <!--                   style="border: 1px solid black; padding: 5px;"-->
+      <!--                   required="required">-->
+      <!--            <p>-->
+      <!--			<p>-->
+      <!--			<i>Step 2. Click "Submit" button below to get parsed file:</i><br>-->
+      <!--            <input type="submit"-->
+      <!--                   value="Submit"-->
+      <!--                   style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">-->
+      <!--    </form>-->
+
+    For questions, comments, or suggestions for improvement on the apps, please email Sam Klump at <a href="mailto:sam.klump@outlook.com">sam.klump@outlook.com.</a>
+
+    </div>
+    <!-- <div class="col-1"></div>
+    <div class="col-5">
+      <br />
+      <h4 class="font-weight-light">Overview</h4>
+      This app organizes and analyzes social media comments copy-pasted from a
+      Facebook post. The app first puts each comment in a row in a spreadsheet
+      with a corresponding commenter, a unique comment ID, and the number of
+      "likes". The app also creates an analysis tab, which includes a table of
+      the most common two words in a row (with the frequency), the most common
+      three words in a row (with the frequency), and the most "liked" comments.
+      <p></p> -->
+      <!--            Click <a href="https://youtube.com">here</a> for a video demonstration of the Facebook Comment App.-->
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
