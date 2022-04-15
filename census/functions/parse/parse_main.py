@@ -23,6 +23,7 @@ def parse_func(wbs, table_ids, years):
     from .blockgroups.B15002_education_parser import B15002_parse_edu
     from .blockgroups.B17017_poverty_parser import B17017_parse_poverty
     from .blockgroups.B19001_income_parser import B19001_parse_income
+    from .blockgroups.B25003_housingtenure_house_parser import B25003_parse_housingtenure_house
     from .blockgroups.B25008_housingtenure_parser import B25008_parse_housingtenure
     from .blockgroups.B25034_houseage_parser import B25034_parse_houseage
     from .blockgroups.B25075_housingvalue_parser import B25075_parse_housingvalue
@@ -51,7 +52,8 @@ def parse_func(wbs, table_ids, years):
         module_dict_bg = {
             'B01001':B01001_parse_age,  'B03002':B03002_parse_race,
             'B08134':B08134_parse_commute,'B15002':B15002_parse_edu,'B17017':B17017_parse_poverty,
-            'B19001':B19001_parse_income,'B25008':B25008_parse_housingtenure,'B25034':B25034_parse_houseage,'B25075':B25075_parse_housingvalue,
+            'B19001':B19001_parse_income,'B25003':B25003_parse_housingtenure_house,'B25008':B25008_parse_housingtenure,
+            'B25034':B25034_parse_houseage,'B25075':B25075_parse_housingvalue,
             'C17002':C17002_parse_incomepovratio, 'C21007':C21007_parse_disab}
         
         module_dict = dict(module_dict.items() | module_dict_bg.items())

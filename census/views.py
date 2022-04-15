@@ -15,7 +15,6 @@ from bs4 import BeautifulSoup as bs
 xlrd.xlsx.ensure_elementtree_imported(False, None)
 xlrd.xlsx.Element_has_iter = True
 import pandas as pd
-import plotly
 from plotly.offline import plot
 import plotly.express as px
 import plotly.graph_objects as go
@@ -35,6 +34,7 @@ available_tables = {'tracts': ['DP04', 'DP05', 'S0801', 'S1501','S1701','S1810',
 @csrf_exempt
 def census(request):
     return render(request, 'census.html', context={'email':email_master, 'email_link':email_href})
+
 
 @csrf_exempt
 def parse(request):
@@ -98,6 +98,11 @@ def parse(request):
                                f'to be added to the app, please send an email to Sam Klump at sam.klump@outlook.com.')
                 return render(request, 'parse-error.html')
 
+            # Check for duplicates
+            if len(table_ids) != len(set(table_ids)):
+                messages.error(request,
+                               f'There is a duplicate Census table file in the zipped folder. Please remove the duplicate table and try again.')
+                return render(request, 'parse-error.html')
             wbs.append(wb)
             table_ids.append(table_id)
             years.append(year)
@@ -164,16 +169,31 @@ def descriptiveanalysis(request):
 
         ### STEP 2
         cats_dict = {'elderly':request.POST['old'], 'nondriver':request.POST['nondriver'],'lowhousevalue':request.POST['housevalue']}
-        checks_groups = request.POST.getlist('checks')
+        forms = ['poc','lowincome','edu','renter','disab','lead']
+        checks_groups = []
+        for f in forms:
+            try:
+                testvar = request.POST[f]
+            except Exception:
+                pass
+            else:
+                checks_groups.append(f)
 
         ### STEP 3
-        checks_calcs = request.POST.getlist('calcs')
+        forms = ['perc', 'percrank', 'summ', 'matrix']
+        checks_calcs = []
+        for f in forms:
+            try:
+                testvar = request.POST[f]
+            except Exception:
+                pass
+            else:
+                checks_calcs.append(f)
         if "matrix" in checks_calcs:
             if len(fnames) < 2:
                 messages.error(request, f'Please uncheck the "Correlation Matrix" checkbox or upload a zipped folder '
                                         f'with at least two parsed Excel files.')
                 return render(request, 'descriptiveanalysis-error.html')
-        graphset_list = ['test']
 
         # Check that something is checked
         val = 0

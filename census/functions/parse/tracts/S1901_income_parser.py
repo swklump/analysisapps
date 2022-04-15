@@ -2,7 +2,7 @@
 def S1901_parse_income(sheet, num_cols, num_rows, location_id, index_estimate):
     import xlrd
     import pandas as pd
-    from WebApp.census.parse.tracts._helperfunctions import get_rowindex, get_rownameindex
+    from ._helperfunctions import get_rowindex, get_rownameindex
 
     ####INCOME
     #Get income rows

@@ -158,6 +158,7 @@ def analyze_blockgroup(unzipped, cats_dict, checks_groups, checks_calcs, zs, tab
     dict_functions = {'B01001':analyze_B01001, 'B03002':analyze_B03002, 'B08134':analyze_B08134, 'B15002':analyze_B15002, 'C17002':analyze_C17002,
     'B25008':analyze_B25008, 'B25034':analyze_B25034, 'B25075':analyze_B25075, 'C21007':analyze_C21007}
     
+
     #### GET RAW NUMBERS OF ATTRIBUTES
     for c in range(len(df_compiled['location_id'])):
         for b in tablenames_blockgroups:

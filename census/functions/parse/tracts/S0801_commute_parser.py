@@ -2,7 +2,7 @@
 def S0801_parse_commute(sheet, num_cols, num_rows, location_id, index_estimate):
     import pandas as pd
     from decimal import Decimal
-    from WebApp.census.parse.tracts._helperfunctions import get_rowindex, get_rownameindex
+    from ._helperfunctions import get_rowindex, get_rownameindex
 
     # Get indices of male and female
     male_indices = []
