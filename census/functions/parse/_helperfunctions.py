@@ -4,11 +4,12 @@ def get_location_id(sheet, num_cols):
     # Get columns with estimate values (not percent error)
     locations_unprocessed = []
     index_estimate = []
+    
     for n in range(num_cols):
-        if sheet.cell_value(0, n) == '':
+        if sheet.cell_value(1, n) != 'Estimate':
             pass
         else:
-            locations_unprocessed.append(sheet.cell_value(0, n))
+            locations_unprocessed.append(sheet.cell_value(2, n)[:-10]) # remove "!!Estimate"
             index_estimate.append(n)
 
     # Import lookup table as df
@@ -18,9 +19,6 @@ def get_location_id(sheet, num_cols):
     df_loccodes.columns = ['STATE', 'STATEFP', 'COUNTYFP', 'COUNTYNAME', 'CLASSFP']
 
     locations = []
-    states = []
-    counties = []
-    tracts = []
     for location in locations_unprocessed:
         num_commas = location.count(',')
         dict_location = {'blockgroup':'','tract':'','county':'','state':''}
@@ -101,8 +99,5 @@ def get_location_id(sheet, num_cols):
             locations.append(location_code[:-1])
         else:
             locations.append(location_code)
-        # states.append(dict_location['state'])
-        # counties.append(dict_location['county'])
-        # tracts.append(dict_location['tract'])
 
     return locations, index_estimate
