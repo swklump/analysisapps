@@ -41,7 +41,7 @@ function populate_tables(s1,s2,s3,s4,s5,s6,s7){
     if(s1.value == 'Tract'){
         var optionArray = [
             '|Select a table...',
-            // 'dp04|DP04 - Selected Housing Characteristics',
+            'dp04|DP04 - Selected Housing Characteristics',
             'dp05|DP05 - ACS Demographic and Housing Estimates',
             // 's0802|S0802 - Means of Transportation to Work by Selected Characteristics',
             // 's1501|S1501 - Educational Attainment', 's1701|S1701 - Poverty Status in the Past 12 Months',
@@ -128,86 +128,20 @@ function populate_cat(s1,s2, s3){
     sessionStorage.setItem(s1.id+'_key', s1.value);
 
     // API urls for columns
-    const api_url_profile = 'https://api.census.gov/data/2019/acs/acs5/profile/variables.json'
-    const api_url_subject = 'https://api.census.gov/data/2019/acs/acs5/subject/variables.json'
-    const api_url_detailed = 'https://api.census.gov/data/2019/acs/acs5/variables.json'
-    var first_char = s1.value[0];
-    var api_url = '';
+    // query the database to get categories, just pull columns for now
+    // https://www.w3schools.com/xml/ajax_database.asp
+    // 'ENGINE': 'django.db.backends.postgresql',
+    // 'NAME': 'analysisapps',
+    // 'USER': 'postgres',
+    // 'PASSWORD':'Thinktank12',
+    // 'HOST':'localhost',
+    // 'PORT':'5432',
+    $host = "localhost";
+    $user = "postgres";
+    $password = "Thinktank12";
+    $dbname = "analysisapps";
+    $con = pg_connect("host=$host dbname=$dbname user=$user password=$password");
 
-    if (first_char == 'd') {
-        api_url = api_url_profile
-    }
-    else if (first_char == 's') {
-        console.log('yes');
-        api_url = api_url_subject
-    }
-    else if (first_char == 'b') {
-        api_url = api_url_detailed
-    }
-
-    // Get table columns from api census
-    $.getJSON(api_url, function(data) {
-        var cats_sesh_var = [];
-        let column_id = Object.entries(data.variables);
-
-        // Get sorted array to display variables cleanly
-        var column_id_sorted = [];
-        for(var option in column_id) {
-            column_id_sorted.push([column_id[option][0],column_id[option][1].label])
-        }
-
-        column_id_sorted.sort(function(a, b) {
-            var valueA, valueB;
-            valueA = a[1];
-            valueB = b[1];
-            if (valueA < valueB) {return -1;}
-            else if (valueA > valueB) {return 1;}
-            return 0;
-        });
-
-
-        // Add variables to drop down
-        var cats = [];
-        for(var option in column_id_sorted) {
-            key = column_id_sorted[option][0];
-            val = column_id_sorted[option][1];
-            let table_name = key.substring(0,s1.value.length).toLowerCase();
-            var col_type = '';
-            var col_index = '';
-            if (api_url == api_url_profile) {
-                 col_type = 'Percent';
-                 col_index = 7;
-            }
-            else if (api_url == api_url_subject) {
-                col_type = 'Estimate';
-                col_index = 8;
-            }
-            if (s1.value == table_name && val.substring(0,col_index) == col_type){
-
-                // only keep variable text after last '!!'
-                var exp_count = ( val.split("!!", -1).length ) - 1;
-                var val_edited = val;
-                for(i=0;i < exp_count-1;i += 1){
-                    val_edited = val_edited.substring(val_edited.indexOf('!!')+2,)
-                    if (i==0) {
-                        var category = val_edited.substring(0,val_edited.indexOf('!!'));
-                    }
-                }
-
-                category = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
-                // Dont have repeat options
-                if (cats.includes(category, 0) == false) {
-                    var newOption = document.createElement('option');
-                    newOption.value = category;
-                    newOption.innerHTML = category;
-                    s2.options.add(newOption);
-                    cats.push(category);
-                    cats_sesh_var.push(category);
-                };
-            }
-        }
-        sessionStorage.setItem(s2.id+'_key_list', cats_sesh_var.join("`"));
-    });
 }
 
 

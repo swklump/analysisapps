@@ -2,4 +2,5 @@
 /_videos/*
 /_testfiles
 /_testfiles/*
-somefile.txt
+/_modeltables
+/_queries

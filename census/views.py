@@ -1,3 +1,4 @@
+from .models import DP04, DP05
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import StreamingHttpResponse
@@ -19,7 +20,7 @@ from plotly.offline import plot
 import plotly.express as px
 import plotly.graph_objects as go
 import textwrap
-import psycopg2
+import json
 
 email_master = 'sam.klump@outlook.com'
 email_href = 'mailto:' + email_master
@@ -250,41 +251,36 @@ def descriptiveanalysis(request):
 
 @csrf_exempt
 def advancedanalysis(request):
+
+    context = {'model_results':DP04.objects.all()}
+    # context = {'model_results':json.dumps(DP04.objects.all())} # may need this one
     # dummy variables for plot
-    plot_results = return_graph(pd.DataFrame({},columns=['x','y']),'x', 'y','x','y',0)
-    plot_div, model_results, pred_val = plot_results[0], plot_results[1], plot_results[2]
+    # plot_results = return_graph(pd.DataFrame({},columns=['x','y']),'x', 'y','x','y',0)
+    # plot_div, model_results, pred_val = plot_results[0], plot_results[1], plot_results[2]
 
-    cols = """'DP05_0001PE', 'DP05_0002PE', 'DP05_0003PE', 'DP05_0004PE', 'DP05_0005PE', 'DP05_0006PE', 'DP05_0007PE', 'DP05_0008PE', 'DP05_0009PE', 'DP05_0010PE', 'DP05_0011PE', 'DP05_0012PE',
-        'DP05_0013PE', 'DP05_0014PE', 'DP05_0015PE', 'DP05_0016PE', 'DP05_0017PE', 'DP05_0018PE', 'DP05_0019PE', 'DP05_0020PE', 'DP05_0021PE', 'DP05_0022PE', 'DP05_0023PE', 'DP05_0024PE', 'DP05_0025PE',
-        'DP05_0026PE', 'DP05_0027PE', 'DP05_0028PE', 'DP05_0029PE', 'DP05_0030PE', 'DP05_0031PE', 'DP05_0032PE', 'DP05_0033PE', 'DP05_0034PE', 'DP05_0035PE', 'DP05_0036PE', 'DP05_0037PE', 'DP05_0038PE',
-        'DP05_0039PE', 'DP05_0040PE', 'DP05_0041PE', 'DP05_0042PE', 'DP05_0043PE', 'DP05_0044PE', 'DP05_0045PE', 'DP05_0046PE', 'DP05_0047PE', 'DP05_0048PE', 'DP05_0049PE', 'DP05_0050PE', 'DP05_0051PE',
-        'DP05_0052PE', 'DP05_0053PE', 'DP05_0054PE', 'DP05_0055PE', 'DP05_0056PE', 'DP05_0057PE', 'DP05_0058PE', 'DP05_0059PE', 'DP05_0060PE', 'DP05_0061PE', 'DP05_0062PE', 'DP05_0063PE', 'DP05_0064PE',
-        'DP05_0065PE', 'DP05_0066PE', 'DP05_0067PE', 'DP05_0068PE', 'DP05_0069PE', 'DP05_0070PE', 'DP05_0071PE', 'DP05_0072PE', 'DP05_0073PE', 'DP05_0074PE', 'DP05_0075PE', 'DP05_0076PE', 'DP05_0077PE',
-        'DP05_0078PE', 'DP05_0079PE', 'DP05_0080PE', 'DP05_0081PE', 'DP05_0082PE', 'DP05_0083PE', 'DP05_0084PE', 'DP05_0085PE', 'DP05_0086PE', 'DP05_0087PE', 'DP05_0088PE', 'DP05_0089PE',
-        'GEO_ID', 'NAME', 'state', 'county', 'tract'"""
+    # if request.method == "POST":
+        # cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],
+        #              'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'],
+        #              'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],
+        #              'state': request.POST['state']}
 
-    if request.method == "POST":
-        cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],
-                     'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'],
-                     'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],
-                     'state': request.POST['state']}
-
-        xlab = cats_dict['var_ind'][cats_dict['var_ind'].find(':')+1:]
-        ylab = cats_dict['var_dep'][cats_dict['var_dep'].find(':')+1:]
+        # xlab = cats_dict['var_ind'][cats_dict['var_ind'].find(':')+1:]
+        # ylab = cats_dict['var_dep'][cats_dict['var_dep'].find(':')+1:]
         # try:
             # df = advancedanalysis_func(cats_dict)
         # val = test_func(cats_dict, cur)
-        val = ''
+        
         #     plot_results = return_graph(df, 'var_ind', 'var_dep', '% "'+xlab+'"', '% "'+ylab+'"', cats_dict['ind_var_val'])
         #     plot_div, model_results, pred_val = plot_results[0], plot_results[1], round(plot_results[2],1)
         # except Exception:
         #     pass
 
 
-        return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':val,'cols':cols})
+        # return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':val,'cols':cols})
         # return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,
         # 'input_val':int(cats_dict['ind_var_val']), 'input_var': xlab, 'pred_val':pred_val, 'pred_var':ylab})
-    return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,'cols':cols})
+    # return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,'cols':cols})
+    return render(request, 'advancedanalysis.html', context)
 
 #For census advanced analysis app
 def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
