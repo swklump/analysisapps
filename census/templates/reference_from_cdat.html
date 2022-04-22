@@ -1,0 +1,112 @@
+{% extends "base-inputdata.html" %}
+
+{% block content %}
+    <script type='text/javascript'>
+        function alertme(){
+            var data = new FormData($('form').get(0));
+
+            // show the intersections
+            $('#spanLoading').show();
+            $('#divAfterFile').hide();
+
+            $.ajax({
+                url: 'file',
+                type: 'POST',
+                data: data,
+                cache: false,
+                processData: false,
+                contentType: false,
+            })
+            .done(function(data) {
+                $('#id_select_your_intersection').empty();
+
+                $('#spanLoading').css('color', 'black');
+                if(data.success){
+                    for(var i = 0; i < data.intersections.length; i++){
+                        $('#id_select_your_intersection').append($('<option>', {
+                            value: data.intersections[i],
+                            text: data.intersections[i]
+                        }));
+                    }
+                    // hide the intersections
+                    $('#spanLoading').hide();
+                    $('#divAfterFile').show();
+                }
+                else{
+                    $('#spanLoading').css('color', 'red');
+                    $('#spanLoading').html(data.message);
+                }
+
+            });
+        }
+    </script>
+
+    <!-- Start the form -->
+	<h2>Input Data</h2>
+	Please see the "Home" page for program overview and assumptions.
+	<br>The crash file must be in .csv format.
+	<br>
+	<br>
+    <form method="POST" enctype="multipart/form-data">
+		{% csrf_token %}
+		<li>
+
+        <!-- Select state entry -->
+          <label for="id_select_your_state">Select your state:</label>
+          <select name="select_your_state" id="id_select_your_state">
+           <option value="alaska">Alaska</option>
+           <!-- <option value="colorado">Colorado</option> -->
+           <option value="florida">Florida</option>
+           <option value="nebraska">Nebraska</option>
+           <option value="nevada">Nevada</option>
+           <option value="newyork">New York</option>
+           <option value="oregon">Oregon</option>
+           <option value="washington">Washington</option>
+        </select></li>
+        <li>
+
+        <!-- Select file entry -->
+            <label for="id_choose_your_crash_file">Choose your crash file:</label>
+            <input type="file" name="choose_your_crash_file" required="" id="id_choose_your_crash_file" onchange="alertme();">
+            <span id='spanLoading' style='display: none' >loading...</span>
+        </li>
+        <div id='divAfterFile' style='display: none;'>
+            <li>
+
+            <!-- Select the intersection entry -->
+                <label for="id_select_your_intersection">Select your intersection:</label>
+                  <select name="select_your_intersection" id="id_select_your_intersection">
+                </select>
+            </li>
+            <li>
+
+            <!-- Sort by severity entry -->
+              <label for="id_sort_by">Sort by:</label>
+                <select name="sort_by" id="id_sort_by">
+                 <option value="total crashes">Total Crashes</option>
+                 <option value="fatal crashes">Fatal Crashes (K)</option>
+                 <option value="fatal and serious injury crashes">Fatal and Serious Injury Crashes (K+A)</option>
+                 <option value="fatal and all injury crashes">Fatal and All Injury Crashes (K+A+B+C)</option>
+                </select>
+            </li>
+            <li>
+
+            <!-- Select ped/bike filter entry -->
+              <label for="id_ped_bike_filter">Pedestrian/bicyclist filter:</label>
+              <select name="ped_bike_filter" id="id_ped_bike_filter">
+                <option value="no filter">No Filter</option>
+                <option value="pedestrian and bicyclist crashes only">Pedestrian and Bicyclist Crashes Only</option>
+              </select>
+            </li>
+            <input type="hidden" name="csrfmiddlewaretoken" value="JsTvtxo88BhQCTg4gq07lRaN3jOmhk6EI3RdZ2MAsRwpxDEmEXRUUSjNRn7jZjKE">
+
+            <button class="btn btn-outline-info" type="submit">Submit</button>
+        </div>
+
+    </form>
+
+	<small class="text-muted">Having trouble? Please email Sam Klump at samuel.klump@hdrinc.com.</small>
+
+
+{% endblock content %}
+

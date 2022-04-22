@@ -1,9 +1,13 @@
+# Django, model, and form imports
 from .models import DP04, DP05
+# from .forms import DP04Form
+from django.views.generic.edit import CreateView
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import StreamingHttpResponse
 from django.contrib import messages
 
+# Functions imports
 from .functions.parse.parse_main import parse_func
 from .functions.descriptiveanalysis.data_analysis_tract import analyze_tract
 from .functions.descriptiveanalysis.data_analysis_blockgroup import analyze_blockgroup
@@ -11,6 +15,7 @@ from .functions.advancedanalysis.advancedanalysis_main import advancedanalysis_f
 from .functions.advancedanalysis.test import test_func
 from .functions.dashboard.run_dashboard_main import run_dashboard
 
+# Python package imports
 import zipfile, xlrd, io
 from bs4 import BeautifulSoup as bs
 xlrd.xlsx.ensure_elementtree_imported(False, None)
@@ -122,6 +127,11 @@ def parse(request):
         response['Content-Disposition'] = 'attachment; filename="census_parsed_files.zip"'
         return response
     return render(request, 'parse.html', context={'email':email_master, 'email_link':email_href})
+
+
+@csrf_exempt
+def parse_tableids(request):
+    return render(request, 'parse-tableids.html')
 
 
 @csrf_exempt
@@ -252,35 +262,13 @@ def descriptiveanalysis(request):
 @csrf_exempt
 def advancedanalysis(request):
 
-    context = {'model_results':DP04.objects.all()}
-    # context = {'model_results':json.dumps(DP04.objects.all())} # may need this one
-    # dummy variables for plot
-    # plot_results = return_graph(pd.DataFrame({},columns=['x','y']),'x', 'y','x','y',0)
-    # plot_div, model_results, pred_val = plot_results[0], plot_results[1], plot_results[2]
+    context = {'cols':{'DP04_cols':[f.attname for f in DP04._meta.get_fields()],
+    'DP05_cols':[f.attname for f in DP05._meta.get_fields()],}}
 
-    # if request.method == "POST":
-        # cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],
-        #              'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'],
-        #              'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],
-        #              'state': request.POST['state']}
+    # 'DP04':DP04.objects.all
 
-        # xlab = cats_dict['var_ind'][cats_dict['var_ind'].find(':')+1:]
-        # ylab = cats_dict['var_dep'][cats_dict['var_dep'].find(':')+1:]
-        # try:
-            # df = advancedanalysis_func(cats_dict)
-        # val = test_func(cats_dict, cur)
-        
-        #     plot_results = return_graph(df, 'var_ind', 'var_dep', '% "'+xlab+'"', '% "'+ylab+'"', cats_dict['ind_var_val'])
-        #     plot_div, model_results, pred_val = plot_results[0], plot_results[1], round(plot_results[2],1)
-        # except Exception:
-        #     pass
-
-
-        # return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':val,'cols':cols})
-        # return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,
-        # 'input_val':int(cats_dict['ind_var_val']), 'input_var': xlab, 'pred_val':pred_val, 'pred_var':ylab})
-    # return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,'cols':cols})
     return render(request, 'advancedanalysis.html', context)
+
 
 #For census advanced analysis app
 def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
@@ -347,7 +335,5 @@ def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
     return plot_div, results, pred_val
 
 
-@csrf_exempt
-def parse_tableids(request):
-    return render(request, 'parse-tableids.html')
+
 

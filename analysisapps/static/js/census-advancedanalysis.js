@@ -1,44 +1,24 @@
 // function to populate table drop down based on tract or blockgroup selected
-function populate_tables(s1,s2,s3,s4,s5,s6,s7){
+function populate_tables(s1,s2,s3,s4,s5){
     var s1 = document.getElementById(s1);
     var s2 = document.getElementById(s2);
     var s3 = document.getElementById(s3);
     var s4 = document.getElementById(s4);
     var s5 = document.getElementById(s5);
-    var s6 = document.getElementById(s6);
-    var s7 = document.getElementById(s7);
 
-    sessionStorage.setItem('test_key', "{{cols}}");
-
-    // set session storage variable for tract_block group
-    sessionStorage.setItem(s1.id+'_key', s1.value);
-
-    s2.innerHTML = '';
-    s3.innerHTML = '';
-    s4.innerHTML = '';
-    s5.innerHTML = '';
-    s6.innerHTML = '';
-    s7.innerHTML = '';
-    if (s1.value == null | s1.value == '') {
-        sessionStorage.removeItem(s2.id + '_key')
-        sessionStorage.removeItem(s3.id + '_key')
-        sessionStorage.removeItem(s4.id + '_key')
-        sessionStorage.removeItem(s4.id + '_key_list')
-        sessionStorage.removeItem(s5.id + '_key')
-        sessionStorage.removeItem(s5.id + '_key_list')
-        sessionStorage.removeItem(s6.id + '_key')
-        sessionStorage.removeItem(s6.id + '_key_html')
-        sessionStorage.removeItem(s6.id + '_key_list')
-        sessionStorage.removeItem(s6.id + '_key_list_html')
-        sessionStorage.removeItem(s7.id + '_key')
-        sessionStorage.removeItem(s7.id + '_key_html')
-        sessionStorage.removeItem(s7.id + '_key_list')
-        sessionStorage.removeItem(s7.id + '_key_list_html')
+    var vals = [s2,s3,s4,s5];
+    for (v in vals) {
+        vals[v].innerHTML = '';
     }
 
+    if (s1.value == null | s1.value == '') {
+        for (v in vals) {
+            sessionStorage.removeItem(vals[v].id + '_key')
+        }
+    }
 
     // assign table drop down items by tract or block group selection
-    if(s1.value == 'Tract'){
+    if(s1.value == 'tract'){
         var optionArray = [
             '|Select a table...',
             'dp04|DP04 - Selected Housing Characteristics',
@@ -47,7 +27,7 @@ function populate_tables(s1,s2,s3,s4,s5,s6,s7){
             // 's1501|S1501 - Educational Attainment', 's1701|S1701 - Poverty Status in the Past 12 Months',
             // 's1810|S1810 - Disability Characteristics', 's1901|S1901 - Income in the Past 12 Months'
     ];
-    } else if(s1.value == 'Block Group'){
+    } else if(s1.value == 'blockgroup'){
         var optionArray = ['|Select a table...', 'b01001|B01001 - Sex by Age', 'b03002|B03002 - Hispanic or Latino Origin by Race',
         'b08134|B08134 - Means of Transportation to Work by Travel Time',
         'b15002|B15002 - Sex by Educational Attainment for the Population 25 Years and Over',
@@ -59,43 +39,29 @@ function populate_tables(s1,s2,s3,s4,s5,s6,s7){
     }
 
     // run for loop to assign the value and label
-    for(var option in optionArray){
-    var pair = optionArray[option].split('|');
-    var newOption = document.createElement('option');
-    newOption.value = pair[0];
-    newOption.innerHTML = pair[1];
-    s2.options.add(newOption);
+    for(var option in optionArray) {
+        var pair = optionArray[option].split('|');
+        var newOption = document.createElement('option');
+        newOption.value = pair[0];
+        newOption.innerHTML = pair[1];
+        s2.options.add(newOption);
     }
 
-    // run for loop to assign the value and label
-    for(var option in optionArray){
-    var pair = optionArray[option].split('|');
-    var newOption = document.createElement('option');
-    newOption.value = pair[0];
-    newOption.innerHTML = pair[1];
-    s3.options.add(newOption);
-    }
-
-    // reset the variable drop downs to blank if tr_bg changed after
-    if(s1.value == ''){
-    var newOption = document.createElement('option')
-    newOption.value = '';
-    newOption.innerHTML = '';
-    s4.options.add(newOption);
-    s5.options.add(newOption);
-    s6.options.add(newOption);
-    s7.options.add(newOption);
-    }
-
+    for(var option in optionArray) {
+        var pair = optionArray[option].split('|');
+        var newOption = document.createElement('option');
+        newOption.value = pair[0];
+        newOption.innerHTML = pair[1];
+        s4.options.add(newOption);
+        }
 }
-
 
 //function to populate category drop down based on table selected
-function populate_cat(s1,s2, s3){
+function populate_col(s1,s2,s3){
     var s1 = document.getElementById(s1);
     var s2 = document.getElementById(s2);
-    var s3 = document.getElementById(s3);
 
+    // Reset values if previous drop down is blank
     if (s1.value == '') {
         s2.innerHTML = '';
         var newOption = document.createElement('option')
@@ -115,131 +81,15 @@ function populate_cat(s1,s2, s3){
         sessionStorage.removeItem(s2.id + '_key_list')
     }
 
-    s3.innerHTML = '';
-    var newOption = document.createElement('option')
-    newOption.value = '';
-    newOption.innerHTML = '';
-    s3.options.add(newOption);
-    sessionStorage.removeItem(s3.id + '_key')
-    sessionStorage.removeItem(s3.id + '_key_list')
-    sessionStorage.removeItem(s3.id + '_key_list_html')
 
-    // set session storage variable for table
-    sessionStorage.setItem(s1.id+'_key', s1.value);
-
-    // API urls for columns
-    // query the database to get categories, just pull columns for now
-    // https://www.w3schools.com/xml/ajax_database.asp
-    // 'ENGINE': 'django.db.backends.postgresql',
-    // 'NAME': 'analysisapps',
-    // 'USER': 'postgres',
-    // 'PASSWORD':'Thinktank12',
-    // 'HOST':'localhost',
-    // 'PORT':'5432',
-    $host = "localhost";
-    $user = "postgres";
-    $password = "Thinktank12";
-    $dbname = "analysisapps";
-    $con = pg_connect("host=$host dbname=$dbname user=$user password=$password");
-
-}
-
-
-//function to populate variable drop down based on category selected
-function populate_var(s1,s2,s3){
-
-    var s1 = document.getElementById(s1);
-    var s2 = document.getElementById(s2);
-    var s3 = document.getElementById(s3);
-
-    if (s1.value == '') {
-        s2.innerHTML = '';
-        var newOption = document.createElement('option')
-        newOption.value = '';
-        newOption.innerHTML = '';
+    // Add options to column drop down
+    var selected_table = s1.value.toUpperCase()+'_cols';
+    for (var option in s3[selected_table]) {
+        var newOption = document.createElement('option');
+        newOption.value = s3[selected_table][option];
+        newOption.innerHTML = s3[selected_table][option];
         s2.options.add(newOption);
-        sessionStorage.removeItem(s2.id + '_key')
-        sessionStorage.removeItem(s2.id + '_key_list')
-    }
-    else {
-        s2.innerHTML = '';
-        var newOption = document.createElement('option')
-        newOption.value = '';
-        newOption.innerHTML = 'Select a category...';
-        s2.options.add(newOption);
-        sessionStorage.removeItem(s2.id + '_key')
-        sessionStorage.removeItem(s2.id + '_key_list')
     }
 
-    sessionStorage.setItem(s1.id+'_key', s1.value);
 
-    // Get table columns from api census
-    const api_url = 'https://api.census.gov/data/2019/acs/acs5/profile/variables.json'
-    $.getJSON(api_url, function(data) {
-        var var_sesh_var = [];
-        var var_sesh_html = []
-        let column_id = Object.entries(data.variables);
-
-        // Get sorted array to display variables cleanly
-        var column_id_sorted = [];
-        for(var option in column_id) {
-            column_id_sorted.push([column_id[option][0],column_id[option][1].label])
-        }
-
-        column_id_sorted.sort(function(a, b) {
-            var valueA, valueB;
-            valueA = a[1];
-            valueB = b[1];
-            if (valueA < valueB) {return -1;}
-            else if (valueA > valueB) {return 1;}
-            return 0;
-        });
-
-        // Add variables to drop down
-        for(var option in column_id_sorted){
-            key = column_id_sorted[option][0];
-            val = column_id_sorted[option][1];
-            let table_name = key.substring(0,s3.value.length).toLowerCase();
-            if (s3.value == table_name && val.substring(0,7) == 'Percent') {
-                // only keep variable text after last !!
-                let exp_count = ( val.split("!!", -1).length ) - 1;
-                let val_edited = val;
-
-                for(i=0;i < exp_count-1;i += 1) {
-                    val_edited = val_edited.substring(val_edited.indexOf('!!')+2,)
-                    if (i==0) {
-                        var category = val_edited.substring(0,val_edited.indexOf('!!'));
-                    };
-                };
-
-                category = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
-                val_edited = val_edited.charAt(0).toUpperCase() + val_edited.slice(1).toLowerCase();
-                val_edited = val_edited.replace('!!',' - ')
-                if (category == s1.value && val_edited.substring(0,category.length) !== category) {
-                    var newOption = document.createElement('option');
-                    newOption.value = key+":"+val_edited;
-                    newOption.innerHTML = val_edited;
-                    s2.options.add(newOption);
-                    var_sesh_var.push(key);
-                    var_sesh_html.push(val_edited);
-                };
-            }
-        }
-        sessionStorage.setItem(s2.id+'_key_list', var_sesh_var.join("`"));
-        sessionStorage.setItem(s2.id+'_key_list_html', var_sesh_html.join("`"));
-    });
 }
-
-// set session storage variable for variable
-function set_session_var(s1){
-    var s1 = document.getElementById(s1);
-    sessionStorage.setItem(s1.id+'_key', s1.value);
-    sessionStorage.setItem(s1.id+'_key_html', s1.options[s1.selectedIndex].text);
-}
-
-function set_session_var_indval(s1){
-    var s1 = document.getElementById(s1);
-    sessionStorage.setItem(s1.id+'_key', s1.value);
-}
-
-
