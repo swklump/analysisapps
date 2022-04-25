@@ -1,11 +1,12 @@
 # Django, model, and form imports
-from .models import DP04, DP05
-# from .forms import DP04Form
+from decimal import Decimal
+from .models import DP04, DP05, DataProfileVars
 from django.views.generic.edit import CreateView
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import StreamingHttpResponse
 from django.contrib import messages
+import json
 
 # Functions imports
 from .functions.parse.parse_main import parse_func
@@ -33,7 +34,7 @@ email_href = 'mailto:' + email_master
 available_tables = {'tracts': ['DP04', 'DP05', 'S0801', 'S1501','S1701','S1810', 'S1901'],
                                 'block_groups': ['B01001','B03002', 'B08134','B15002', 'B17017', 'B19001',
                                                  'B25003', 'B25008', 'B25034','B25075','C17002','C21007']}
-
+model_dict = {'dp04':DP04,'dp05':DP05}
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
 ### CENSUS APP
@@ -262,10 +263,44 @@ def descriptiveanalysis(request):
 @csrf_exempt
 def advancedanalysis(request):
 
-    context = {'cols':{'DP04_cols':[f.attname for f in DP04._meta.get_fields()],
-    'DP05_cols':[f.attname for f in DP05._meta.get_fields()],}}
-
+    # context = {'cols':{'DP04_cols':[f.attname for f in DP04._meta.get_fields()],
+    # 'DP05_cols':[f.attname for f in DP05._meta.get_fields()],}}
+    # data = list(DataProfileVars.objects.filter(group__in=filter_list))
     # 'DP04':DP04.objects.all
+
+    # dummy variables for plot
+    plot_results = return_graph(pd.DataFrame({},columns=['x','y']),'x', 'y','x','y',0)
+    plot_div, model_results, pred_val = plot_results[0], plot_results[1], plot_results[2]
+    filter_list = available_tables['tracts'] + available_tables['block_groups']
+    context = {'cols':json.dumps(list(DataProfileVars.objects.filter(group__in=filter_list).values()))}
+    context['plot_div'], context['model_results'], context['pred_val'] = plot_div, model_results, pred_val
+
+    if request.method == "POST":
+        cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],
+                     'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'],
+                     'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],
+                     'state': request.POST['state']}
+        # need to convert state name to code
+        vals_ind = model_dict[cats_dict['table_ind']].objects.filter(state=cats_dict['state']).values(cats_dict['var_ind'])
+        vals_dep = model_dict[cats_dict['table_dep']].objects.filter(state=cats_dict['state']).values(cats_dict['var_dep'])
+        vals_ind_list, vals_dep_list = [], []
+
+        for x in vals_ind:
+            vals_ind_list.append(Decimal(x[cats_dict['var_ind']]))
+        for x in vals_dep:
+            vals_dep_list.append(Decimal(x[cats_dict['var_dep']]))
+        df = pd.DataFrame()
+        df['var_ind'] = vals_ind_list
+        df['var_dep'] = vals_dep_list
+        df = df[df['var_ind']>=0]
+        df = df[df['var_dep']>=0]
+
+        # xlab = cats_dict['var_ind'][cats_dict['var_ind'].find(':')+1:]
+        # ylab = cats_dict['var_dep'][cats_dict['var_dep'].find(':')+1:]
+        plot_results = return_graph(df, 'var_ind', 'var_dep', '% "'+'test'+'"', '% "'+'test1'+'"', cats_dict['ind_var_val'])
+        plot_div, model_results, pred_val = plot_results[0], plot_results[1], round(plot_results[2],1)
+        return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,
+        'input_val':int(cats_dict['ind_var_val']), 'input_var': 'test', 'pred_val':pred_val, 'pred_var':'test1'})
 
     return render(request, 'advancedanalysis.html', context)
 

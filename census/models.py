@@ -1,5 +1,7 @@
 from django.db import models
 import pandas as pd
+from requests import request
+import json
 
 # # PULL AND FORMAT TABLES FROM CENSUS API-------------------------------------------------------------------------
 # # api_call = 'https://api.census.gov/data/2019/acs/acs5/profile?get=group(DP05)&for=tract:*&in=state:02&in=county:*&key=2d06b2407a7edc598608026ac92014c461d42dbb'
@@ -69,3 +71,20 @@ for k in tables.keys():
             else:
                 # change up this data type later on
                 DP05.add_to_class(x, models.CharField(max_length=255))
+
+
+# PULL TABLE COLUMN DESCRIPTIONS
+response = request(url="https://api.census.gov/data/2020/acs/acs5/profile/variables.json", method='get')
+data=json.loads(response.text)['variables']# pick the 'people' data source from json
+df_vars = pd.DataFrame(data).transpose()
+df_vars['name'] = df_vars.index
+
+# CREATE TABLES FOR VARIABLE DESCRIPTIONS
+class DataProfileVars(models.Model):
+    name = models.CharField(primary_key=True, max_length=300, default='na')
+
+for x in df_vars.columns.tolist():
+    if x =='name':
+        pass
+    else:
+        DataProfileVars.add_to_class(x, models.CharField(max_length=300,default='na'))

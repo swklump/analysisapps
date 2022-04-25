@@ -8,13 +8,23 @@ function populate_tables(s1,s2,s3,s4,s5){
 
     var vals = [s2,s3,s4,s5];
     for (v in vals) {
+        vals[v].value = '';
         vals[v].innerHTML = '';
     }
 
+    localStorage.setItem(s1.id+'_key', s1.value);
+
+    // set session storage variable for tract-block group, remove all others when changed
     if (s1.value == null | s1.value == '') {
         for (v in vals) {
-            sessionStorage.removeItem(vals[v].id + '_key')
+            localStorage.removeItem(vals[v].id + '_key')
         }
+        localStorage.removeItem('col_ind_key_html');
+        localStorage.removeItem('col_dep_key_html');
+        localStorage.removeItem('col_ind_key_list');
+        localStorage.removeItem('col_dep_key_list');
+        localStorage.removeItem('col_ind_key_list_html');
+        localStorage.removeItem('col_dep_key_list_html');
     }
 
     // assign table drop down items by tract or block group selection
@@ -53,6 +63,15 @@ function populate_tables(s1,s2,s3,s4,s5){
         newOption.value = pair[0];
         newOption.innerHTML = pair[1];
         s4.options.add(newOption);
+    }
+
+    // reset the variable drop downs to blank if tr_bg changed after
+    if(s1.value == ''){
+        var newOption = document.createElement('option')
+        newOption.value = '';
+        newOption.innerHTML = '';
+        s4.options.add(newOption);
+        s5.options.add(newOption);
         }
 }
 
@@ -68,8 +87,8 @@ function populate_col(s1,s2,s3){
         newOption.value = '';
         newOption.innerHTML = '';
         s2.options.add(newOption);
-        sessionStorage.removeItem(s2.id + '_key')
-        sessionStorage.removeItem(s2.id + '_key_list')
+        localStorage.removeItem(s2.id + '_key')
+        localStorage.removeItem(s2.id + '_key_list')
     }
     else {
         s2.innerHTML = '';
@@ -77,19 +96,44 @@ function populate_col(s1,s2,s3){
         newOption.value = '';
         newOption.innerHTML = 'Select a category...';
         s2.options.add(newOption);
-        sessionStorage.removeItem(s2.id + '_key')
-        sessionStorage.removeItem(s2.id + '_key_list')
+        localStorage.removeItem(s2.id + '_key')
+        localStorage.removeItem(s2.id + '_key_list')
     }
 
+    // set session storage variable for table
+    localStorage.setItem(s1.id+'_key', s1.value);
 
     // Add options to column drop down
-    var selected_table = s1.value.toUpperCase()+'_cols';
-    for (var option in s3[selected_table]) {
-        var newOption = document.createElement('option');
-        newOption.value = s3[selected_table][option];
-        newOption.innerHTML = s3[selected_table][option];
-        s2.options.add(newOption);
+    var var_sesh_var = [];
+    var var_sesh_html = [];
+    var selected_table = s1.value.toUpperCase();
+    var data = JSON.parse(s3)
+    for (var option in data) {
+
+        if (data[option]['group']==selected_table) {
+            var newOption = document.createElement('option');
+            newOption.value = data[option]['name'];
+            newOption.innerHTML = data[option]['label'].substring(9,);
+            s2.options.add(newOption);
+            var_sesh_var.push(data[option]['name']);
+            var_sesh_html.push(data[option]['label'].substring(9,));
+
+        }
     }
+    localStorage.setItem(s2.id+'_key_list', var_sesh_var.join("`"));
+    localStorage.setItem(s2.id+'_key_list_html', var_sesh_html.join("`"));
 
 
+}
+
+// set session storage variable for variable
+function set_session_var(s1){
+    var s1 = document.getElementById(s1);
+    localStorage.setItem(s1.id+'_key', s1.value);
+    localStorage.setItem(s1.id+'_key_html', s1.options[s1.selectedIndex].text);
+}
+
+function set_session_var_indval(s1){
+    var s1 = document.getElementById(s1);
+    localStorage.setItem(s1.id+'_key', s1.value);
 }
