@@ -75,8 +75,71 @@ function populate_tables(s1,s2,s3,s4,s5){
         }
 }
 
-//function to populate category drop down based on table selected
-function populate_col(s1,s2,s3){
+//function to populate category drop down based on variable selected
+function populate_cat(s1,s2,s3,s4){
+    var s1 = document.getElementById(s1);
+    var s2 = document.getElementById(s2);
+    var s3 = document.getElementById(s3);
+
+    // Reset values if previous drop down is blank
+    if (s1.value == '') {
+        s2.innerHTML = '';
+        var newOption = document.createElement('option')
+        newOption.value = '';
+        newOption.innerHTML = '';
+        s2.options.add(newOption);
+        localStorage.removeItem(s2.id + '_key')
+        localStorage.removeItem(s2.id + '_key_list')
+        
+        s3.innerHTML = '';
+        s3.options.add(newOption);
+        localStorage.removeItem(s3.id + '_key')
+        localStorage.removeItem(s3.id + '_key_list')
+    }
+    else {
+        s2.innerHTML = '';
+        var newOption = document.createElement('option')
+        newOption.value = '';
+        newOption.innerHTML = 'Select a category...';
+        s2.options.add(newOption);
+        localStorage.removeItem(s2.id + '_key')
+        localStorage.removeItem(s2.id + '_key_list')
+    }
+
+    // set session storage variable for table
+    localStorage.setItem(s1.id+'_key', s1.value);
+
+    // Add options to category drop down
+    var cat_sesh_var = [];
+    var cat_sesh_html = [];
+    var selected_table = s1.value.toUpperCase();
+    var data = JSON.parse(s4)
+    var cats = []
+    for (var option in data) {
+        if (data[option]['group']==selected_table) {
+            var showtext = data[option]['label'].substring(9,);
+            showtext = showtext.substring(0,showtext.indexOf('!!'));
+            if (cats.includes(showtext)==false && showtext!=='') {
+                cats.push(showtext);
+            }
+        }
+    }
+    cats.sort();
+
+    for (var cat in cats) {
+        var newOption = document.createElement('option');
+        newOption.value = cats[cat];
+        newOption.innerHTML = cats[cat];
+        s2.options.add(newOption);
+        cat_sesh_var.push(data[option]['name']);
+        cat_sesh_html.push(data[option]['label'].substring(9,));
+    }
+    localStorage.setItem(s2.id+'_key_list', cat_sesh_var.join("`"));
+    localStorage.setItem(s2.id+'_key_list_html', cat_sesh_html.join("`"));
+}
+
+//function to populate variable drop down based on category selected
+function populate_var(s1,s2,s3){
     var s1 = document.getElementById(s1);
     var s2 = document.getElementById(s2);
 

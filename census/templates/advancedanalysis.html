@@ -124,26 +124,31 @@
               <option value="blockgroup">Block Group</option>
             </select>
             <p></p>
-            <!-- <li>{{ cols }}</li> -->
+
             <li>Independent Variable</li>
-            <!-- Select independent table -->
-            <select name="table_ind" id="table_ind" class="form-select form-select-sm" onchange="populate_col(this.id,'var_ind','{{cols}}')">
+
+            <select name="table_ind" id="table_ind" class="form-select form-select-sm" onchange="populate_cat(this.id,'cat_ind','var_ind','{{cols}}')">
             </select>
             <p></p>
 
-            <!-- Select independent column -->
+            <select name="cat_ind" id='cat_ind' class="form-select form-select-sm" onchange="set_session_var(this.id)">
+            </select>
+            <p></p>
+
             <select name="var_ind" id='var_ind' class="form-select form-select-sm" onchange="set_session_var(this.id)">
             </select>
             <p></p>
 
 
           <li>Dependent Variable</li>
-            <!-- Select dependent table -->
-            <select name="table_dep" id="table_dep" class="form-select form-select-sm" onchange="populate_col(this.id,'var_dep','{{cols}}')">
+            <select name="table_dep" id="table_dep" class="form-select form-select-sm" onchange="populate_cat(this.id,'cat_dep','var_dep','{{cols}}')">
             </select>
             <p></p>
 
-            <!-- Select dependent column -->
+            <select name="cat_dep" id='cat_dep' class="form-select form-select-sm" onchange="set_session_var(this.id)">
+            </select>
+            <p></p>
+
             <select name="var_dep" id='var_dep' class="form-select form-select-sm" onchange="set_session_var(this.id)">
             </select>
             <p></p>
