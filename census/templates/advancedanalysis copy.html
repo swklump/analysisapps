@@ -37,101 +37,58 @@
             $("#table_ind").val(tab_ind);
 
             /// Load category selection
-            var s2 = document.getElementById("cat_ind");
-            var cats = localStorage.getItem("cat_ind_key_list");
-            var cats_array = cats.split('`');
+            var s2 = document.getElementById("var_ind");
+            var vars = localStorage.getItem("var_ind_key_list");
+            var vars_array = vars.split('`');
+            var vars_html = localStorage.getItem("var_ind_key_list_html");
+            var vars_html_array = vars_html.split('`');
             var newOption = document.createElement('option');
             newOption.value = '';
-            newOption.innerHTML = 'Select a category...';
+            newOption.innerHTML = 'Select a variable...';
             s2.options.add(newOption);
-            for (i in cats_array){
+            for (i in vars_array){
               var newOption = document.createElement('option');
-              newOption.value = cats_array[i];
-              newOption.innerHTML = cats_array[i];
+              newOption.value = vars_array[i];
+              newOption.innerHTML = vars_html_array[i];
               s2.options.add(newOption);
             };
-
-            var cat_ind = localStorage.getItem("cat_ind_key");
-            if (cat_ind !== null) {
-              $("#cat_ind").val(cat_ind);
-              /// Load variable selection
-              var s2 = document.getElementById("var_ind");
-              var vars = localStorage.getItem("var_ind_key_list");
-              var vars_array = vars.split('`');
-              var vars_html = localStorage.getItem("var_ind_key_list_html");
-              var vars_html_array = vars_html.split('`');
-              var newOption = document.createElement('option');
-              newOption.value = '';
-              newOption.innerHTML = 'Select a variable...';
-              s2.options.add(newOption);
-              for (i in vars_array){
-                var newOption = document.createElement('option');
-                newOption.value = vars_array[i];
-                newOption.innerHTML = vars_html_array[i];
-                s2.options.add(newOption);
-              };
-            }
 
             var var_ind = localStorage.getItem("var_ind_key");
-            var var_ind_desc = localStorage.getItem("var_ind_key_html");
             if (var_ind !== null) {
               $("#var_ind").val(var_ind);
-              $("#var_ind_desc").val(var_ind_desc);
-            };
+            }
           }
           
           // Dependent Variable
           if (tab_dep !== null && tab_dep !== '') {
             $("#table_dep").val(tab_dep);
 
-            /// Load category selection
-            var s2 = document.getElementById("cat_dep");
-            var cats = localStorage.getItem("cat_dep_key_list");
-            var cats_array = cats.split('`');
+            /// Load variable selection
+            var s2 = document.getElementById("var_dep");
+            var vars = localStorage.getItem("var_dep_key_list");
+            var vars_array = vars.split('`');
+            var vars_html = localStorage.getItem("var_dep_key_list_html");
+            var vars_html_array = vars_html.split('`');
             var newOption = document.createElement('option');
             newOption.value = '';
-            newOption.innerHTML = 'Select a category...';
+            newOption.innerHTML = 'Select a variable...';
             s2.options.add(newOption);
-            for (i in cats_array){
+            for (i in vars_array){
               var newOption = document.createElement('option');
-              newOption.value = cats_array[i];
-              newOption.innerHTML = cats_array[i];
+              newOption.value = vars_array[i];
+              newOption.innerHTML = vars_html_array[i];
               s2.options.add(newOption);
             };
-
-            var cat_dep = localStorage.getItem("cat_dep_key");
-            if (cat_dep !== null) {
-              $("#cat_dep").val(cat_dep);
-              /// Load variable selection
-              var s2 = document.getElementById("var_dep");
-              var vars = localStorage.getItem("var_dep_key_list");
-              var vars_array = vars.split('`');
-              var vars_html = localStorage.getItem("var_dep_key_list_html");
-              var vars_html_array = vars_html.split('`');
-              var newOption = document.createElement('option');
-              newOption.value = '';
-              newOption.innerHTML = 'Select a variable...';
-              s2.options.add(newOption);
-              for (i in vars_array){
-                var newOption = document.createElement('option');
-                newOption.value = vars_array[i];
-                newOption.innerHTML = vars_html_array[i];
-                s2.options.add(newOption);
-              };
-            }
 
             var var_dep = localStorage.getItem("var_dep_key");
-            var var_dep_desc = localStorage.getItem("var_dep_key_html");
             if (var_dep !== null) {
               $("#var_dep").val(var_dep);
-              $("#var_dep_desc").val(var_dep_desc);
-            };
+            }
           }
         }
 
         else {
-          var items = ['table_ind_key','table_dep_key','cat_ind_key','cat_ind_key_list','cat_dep_key','cat_dep_key_list',
-          'var_ind_key','var_ind_key_html','var_ind_key_list','var_ind_key_list_html',
+          var items = ['table_ind_key','table_dep_key','var_ind_key','var_ind_key_html','var_ind_key_list','var_ind_key_list_html',
           'var_dep_key','var_dep_key_html','var_dep_key_list','var_dep_key_list_html']
           for (x in items) {}
           localStorage.removeItem(items[x])
@@ -178,16 +135,9 @@
             </select>
             <p></p>
 
-            <select name="var_ind" id='var_ind' class="form-select form-select-sm" onchange="set_session_var(this.id, 'var_ind_desc')">
+            <select name="var_ind" id='var_ind' class="form-select form-select-sm" onchange="set_session_var(this.id)">
             </select>
             <p></p>
-
-            <input
-            type="hidden"
-            name="var_ind_desc"
-            id="var_ind_desc"
-            style="width: 300"
-            />
 
 
           <li>Dependent Variable</li>
@@ -199,16 +149,9 @@
             </select>
             <p></p>
 
-            <select name="var_dep" id='var_dep' class="form-select form-select-sm" onchange="set_session_var(this.id, 'var_dep_desc')">
+            <select name="var_dep" id='var_dep' class="form-select form-select-sm" onchange="set_session_var(this.id)">
             </select>
             <p></p>
-
-            <input
-            type="hidden"
-            name="var_dep_desc"
-            id="var_dep_desc"
-            style="width: 300"
-            />
 
             <li>Enter the independent variable value (%)</li>
             <div class="input-group input-group-sm mb-3" style="width: 150px">
@@ -228,7 +171,7 @@
                   class="form-select form-select-sm"
                   name="year"
                   id="year"
-                  onchange="set_session_var_indval(this.id)"
+                  onchange="set_session_var(this.id)"
                   required="required">
                   <option value="">Select a year...</option>
                   <option value="2019">2019</option>
@@ -241,6 +184,7 @@
                   <option value="2012">2012</option>
                   <option value="2011">2011</option>
                   <option value="2010">2010</option> -->
+
                 </select>
               </div>
               <div class="col-xs-12 col-sm-12 col-md-6">
@@ -248,7 +192,7 @@
                   class="form-select form-select-sm"
                   name="state"
                   id="state"
-                  onchange="set_session_var_indval(this.id)"
+                  onchange="set_session_var(this.id)"
                   required="required">
                 <option value="">Select a state...</option>
                 <option value="01">Alabama</option>

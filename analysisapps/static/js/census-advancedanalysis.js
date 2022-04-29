@@ -1,31 +1,43 @@
-// function to populate table drop down based on tract or blockgroup selected
-function populate_tables(s1,s2,s3,s4,s5){
+function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
+// function to populate table drop down based on tract or blockgroup selected--------------------------------------------------------
+function populate_tables(s1,s2,s3,s4,s5,s6,s7){
     var s1 = document.getElementById(s1);
     var s2 = document.getElementById(s2);
     var s3 = document.getElementById(s3);
     var s4 = document.getElementById(s4);
     var s5 = document.getElementById(s5);
+    var s6 = document.getElementById(s6);
+    var s7 = document.getElementById(s7);
 
-    var vals = [s2,s3,s4,s5];
+    var vals = [s2,s3,s4,s5,s6,s7];
     for (v in vals) {
         vals[v].value = '';
         vals[v].innerHTML = '';
     }
 
-    localStorage.setItem(s1.id+'_key', s1.value);
-
     // set session storage variable for tract-block group, remove all others when changed
+    localStorage.setItem(s1.id+'_key', s1.value);
     if (s1.value == null | s1.value == '') {
         for (v in vals) {
             localStorage.removeItem(vals[v].id + '_key')
         }
-        localStorage.removeItem('col_ind_key_html');
-        localStorage.removeItem('col_dep_key_html');
-        localStorage.removeItem('col_ind_key_list');
-        localStorage.removeItem('col_dep_key_list');
-        localStorage.removeItem('col_ind_key_list_html');
-        localStorage.removeItem('col_dep_key_list_html');
+        var loc_stor_arr = ['cat_ind_key_list',
+        'cat_dep_key_html', 'cat_dep_key_list','cat_dep_key_list_html',
+        'var_ind_key_html', 'var_ind_key_list','var_ind_key_list_html',
+        'var_dep_key_html', 'var_dep_key_list','var_dep_key_list_html']
+        for (v in loc_stor_arr) {
+            localStorage.removeItem(loc_stor_arr[v]);
     }
+    }
+    
 
     // assign table drop down items by tract or block group selection
     if(s1.value == 'tract'){
@@ -62,7 +74,7 @@ function populate_tables(s1,s2,s3,s4,s5){
         var newOption = document.createElement('option');
         newOption.value = pair[0];
         newOption.innerHTML = pair[1];
-        s4.options.add(newOption);
+        s5.options.add(newOption);
     }
 
     // reset the variable drop downs to blank if tr_bg changed after
@@ -71,17 +83,19 @@ function populate_tables(s1,s2,s3,s4,s5){
         newOption.value = '';
         newOption.innerHTML = '';
         s4.options.add(newOption);
-        s5.options.add(newOption);
+        s6.options.add(newOption);
+        s7.options.add(newOption);
         }
 }
 
-//function to populate category drop down based on variable selected
+
+//function to populate category drop down based on variable selected-----------------------------------------------------------------
 function populate_cat(s1,s2,s3,s4){
     var s1 = document.getElementById(s1);
     var s2 = document.getElementById(s2);
     var s3 = document.getElementById(s3);
 
-    // Reset values if previous drop down is blank
+    // set the category dropdown to blank if table is set to blank
     if (s1.value == '') {
         s2.innerHTML = '';
         var newOption = document.createElement('option')
@@ -90,12 +104,8 @@ function populate_cat(s1,s2,s3,s4){
         s2.options.add(newOption);
         localStorage.removeItem(s2.id + '_key')
         localStorage.removeItem(s2.id + '_key_list')
-        
-        s3.innerHTML = '';
-        s3.options.add(newOption);
-        localStorage.removeItem(s3.id + '_key')
-        localStorage.removeItem(s3.id + '_key_list')
     }
+    // set category dropdown to "select a category" if table changes
     else {
         s2.innerHTML = '';
         var newOption = document.createElement('option')
@@ -105,45 +115,56 @@ function populate_cat(s1,s2,s3,s4){
         localStorage.removeItem(s2.id + '_key')
         localStorage.removeItem(s2.id + '_key_list')
     }
+
+    // set the variable dropdown to blank regardless
+    s3.innerHTML = '';
+    var newOption = document.createElement('option')
+    newOption.value = '';
+    newOption.innerHTML = '';
+    s3.options.add(newOption);
+    localStorage.removeItem(s2.id + '_key')
+    localStorage.removeItem(s2.id + '_key_list')
 
     // set session storage variable for table
     localStorage.setItem(s1.id+'_key', s1.value);
 
-    // Add options to category drop down
+    // get categories from database table
     var cat_sesh_var = [];
     var cat_sesh_html = [];
     var selected_table = s1.value.toUpperCase();
     var data = JSON.parse(s4)
-    var cats = []
+    var cat_array = []
     for (var option in data) {
         if (data[option]['group']==selected_table) {
             var showtext = data[option]['label'].substring(9,);
             showtext = showtext.substring(0,showtext.indexOf('!!'));
-            if (cats.includes(showtext)==false && showtext!=='') {
-                cats.push(showtext);
+            if (cat_array.includes(showtext)==false && showtext!=='') {
+                cat_array.push(showtext);
             }
         }
     }
-    cats.sort();
+    cat_array.sort();
 
-    for (var cat in cats) {
+    // assign categories to drop down
+    for (i=0; i<cat_array.length;i++) {
         var newOption = document.createElement('option');
-        newOption.value = cats[cat];
-        newOption.innerHTML = cats[cat];
+        newOption.value = toTitleCase(cat_array[i]);
+        newOption.innerHTML = toTitleCase(cat_array[i]);
         s2.options.add(newOption);
-        cat_sesh_var.push(data[option]['name']);
-        cat_sesh_html.push(data[option]['label'].substring(9,));
+        cat_sesh_var.push(toTitleCase(cat_array[i]));
     }
     localStorage.setItem(s2.id+'_key_list', cat_sesh_var.join("`"));
-    localStorage.setItem(s2.id+'_key_list_html', cat_sesh_html.join("`"));
 }
 
-//function to populate variable drop down based on category selected
-function populate_var(s1,s2,s3){
+
+
+//function to populate variable drop down based on category selected------------------------------------------------------------------
+function populate_var(s1,s2,s3,s4){
     var s1 = document.getElementById(s1);
     var s2 = document.getElementById(s2);
+    var s3 = document.getElementById(s3);
 
-    // Reset values if previous drop down is blank
+    // set the variable dropdown to blank if category is set to blank
     if (s1.value == '') {
         s2.innerHTML = '';
         var newOption = document.createElement('option')
@@ -153,11 +174,12 @@ function populate_var(s1,s2,s3){
         localStorage.removeItem(s2.id + '_key')
         localStorage.removeItem(s2.id + '_key_list')
     }
+    // set variable dropdown to "select a variable" if category changes
     else {
         s2.innerHTML = '';
         var newOption = document.createElement('option')
         newOption.value = '';
-        newOption.innerHTML = 'Select a category...';
+        newOption.innerHTML = 'Select a variable...';
         s2.options.add(newOption);
         localStorage.removeItem(s2.id + '_key')
         localStorage.removeItem(s2.id + '_key_list')
@@ -169,20 +191,38 @@ function populate_var(s1,s2,s3){
     // Add options to column drop down
     var var_sesh_var = [];
     var var_sesh_html = [];
-    var selected_table = s1.value.toUpperCase();
-    var data = JSON.parse(s3)
+    var selected_table = s3.value.toUpperCase();
+    var data = JSON.parse(s4)
+
+    // iterate through variables, add to array if table and column are same as selected in dropdowns
+    var var_array = [];
     for (var option in data) {
-
         if (data[option]['group']==selected_table) {
-            var newOption = document.createElement('option');
-            newOption.value = data[option]['name'];
-            newOption.innerHTML = data[option]['label'].substring(9,);
-            s2.options.add(newOption);
-            var_sesh_var.push(data[option]['name']);
-            var_sesh_html.push(data[option]['label'].substring(9,));
+            var cat = data[option]['label'].substring(9,);
+            var cat_check = toTitleCase(cat.substring(0,cat.indexOf('!!')));
 
+            if (cat_check == s1.value) {
+                var var_display = cat.substring(cat.indexOf('!!')+2,cat.length); 
+
+                if (var_display.includes('!!')) {
+                    var_display = var_display.substring(var_display.indexOf('!!')+2,var_display.length).replace(/!!/g, " - ");
+                    var_array.push(var_display + '@' + data[option]['name']);
+                }  
+            }
         }
     }
+
+    // add vars to drop down
+    var_array.sort();
+    for (i=0; i<var_array.length;i++){
+        var newOption = document.createElement('option');
+        newOption.value = var_array[i].substring(var_array[i].indexOf('@')+1,var_array[i].length);
+        newOption.innerHTML = var_array[i].substring(0,var_array[i].indexOf('@'));
+        s2.options.add(newOption);
+        var_sesh_var.push(var_array[i].substring(var_array[i].indexOf('@')+1,var_array[i].length));
+        var_sesh_html.push(var_array[i].substring(0,var_array[i].indexOf('@')));
+    }
+
     localStorage.setItem(s2.id+'_key_list', var_sesh_var.join("`"));
     localStorage.setItem(s2.id+'_key_list_html', var_sesh_html.join("`"));
 
@@ -190,10 +230,11 @@ function populate_var(s1,s2,s3){
 }
 
 // set session storage variable for variable
-function set_session_var(s1){
+function set_session_var(s1, s2){
     var s1 = document.getElementById(s1);
     localStorage.setItem(s1.id+'_key', s1.value);
     localStorage.setItem(s1.id+'_key_html', s1.options[s1.selectedIndex].text);
+    document.getElementById(s2).value = s1.options[s1.selectedIndex].text;
 }
 
 function set_session_var_indval(s1){

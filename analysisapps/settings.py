@@ -66,7 +66,19 @@ WSGI_APPLICATION = 'analysisapps.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# python anywhere postgres
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'anhcsurvey',
+#         'USER': 'swklump',
+#         'PASSWORD':'AnhCSuRVEy2O21',
+#         'HOST':'swklump-2473.postgres.pythonanywhere-services.com',
+#         'PORT':'12473',
+#     }
+# }
 
+# local postgres
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

@@ -276,10 +276,9 @@ def advancedanalysis(request):
     context['plot_div'], context['model_results'], context['pred_val'] = plot_div, model_results, pred_val
 
     if request.method == "POST":
-        cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],
-                     'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'],
-                     'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],
-                     'state': request.POST['state']}
+        cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],'var_ind_desc': request.POST['var_ind_desc'],
+                     'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'], 'var_dep_desc': request.POST['var_dep_desc'],
+                     'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],'state': request.POST['state']}
         # need to convert state name to code
         vals_ind = model_dict[cats_dict['table_ind']].objects.filter(state=cats_dict['state']).values(cats_dict['var_ind'])
         vals_dep = model_dict[cats_dict['table_dep']].objects.filter(state=cats_dict['state']).values(cats_dict['var_dep'])
@@ -297,10 +296,10 @@ def advancedanalysis(request):
 
         # xlab = cats_dict['var_ind'][cats_dict['var_ind'].find(':')+1:]
         # ylab = cats_dict['var_dep'][cats_dict['var_dep'].find(':')+1:]
-        plot_results = return_graph(df, 'var_ind', 'var_dep', '% "'+'test'+'"', '% "'+'test1'+'"', cats_dict['ind_var_val'])
-        plot_div, model_results, pred_val = plot_results[0], plot_results[1], round(plot_results[2],1)
-        return render(request, 'advancedanalysis.html', context={'plot_div': plot_div, 'model_results':model_results,
-        'input_val':int(cats_dict['ind_var_val']), 'input_var': 'test', 'pred_val':pred_val, 'pred_var':'test1'})
+        plot_results = return_graph(df, 'var_ind', 'var_dep', '% "'+cats_dict['var_ind_desc']+'"', '% "'+cats_dict['var_dep_desc']+'"', cats_dict['ind_var_val'])
+        context['plot_div'], context['model_results'], context['pred_val'] = plot_results[0], plot_results[1], round(plot_results[2],1)
+        context['input_val'], context['input_var'], context['pred_var'] = int(cats_dict['ind_var_val']), cats_dict['var_ind_desc'], cats_dict['var_dep_desc']
+        return render(request, 'advancedanalysis.html', context)
 
     return render(request, 'advancedanalysis.html', context)
 
