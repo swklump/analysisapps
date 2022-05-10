@@ -7,10 +7,8 @@ from .functions.aktrafficvolume.akdata_main import akdata_script
 from .functions.ihsdm.ihsdm_parse_main import ihsdm_parse_func
 from .functions.tam.tam import tam_func
 
-import zipfile, xlrd, io
+import zipfile, io
 from bs4 import BeautifulSoup as bs
-xlrd.xlsx.ensure_elementtree_imported(False, None)
-xlrd.xlsx.Element_has_iter = True
 import pandas as pd
 import plotly
 from plotly.offline import plot

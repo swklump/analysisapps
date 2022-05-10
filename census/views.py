@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import StreamingHttpResponse
 from django.contrib import messages
 import json
+import time
 
 # Functions imports
 from .functions.parse.parse_main import parse_func
@@ -19,8 +20,8 @@ from .functions.dashboard.run_dashboard_main import run_dashboard
 # Python package imports
 import zipfile, xlrd, io
 from bs4 import BeautifulSoup as bs
-xlrd.xlsx.ensure_elementtree_imported(False, None)
-xlrd.xlsx.Element_has_iter = True
+# xlrd.xlsx.ensure_elementtree_imported(False, None)
+# xlrd.xlsx.Element_has_iter = True
 import pandas as pd
 from plotly.offline import plot
 import plotly.express as px
@@ -263,27 +264,23 @@ def descriptiveanalysis(request):
 @csrf_exempt
 def advancedanalysis(request):
 
-    # context = {'cols':{'DP04_cols':[f.attname for f in DP04._meta.get_fields()],
-    # 'DP05_cols':[f.attname for f in DP05._meta.get_fields()],}}
-    # data = list(DataProfileVars.objects.filter(group__in=filter_list))
-    # 'DP04':DP04.objects.all
-
     # dummy variables for plot
-    plot_results = return_graph(pd.DataFrame({},columns=['x','y']),'x', 'y','x','y',0)
-    plot_div, model_results, pred_val = plot_results[0], plot_results[1], plot_results[2]
+    plot_div = return_graph_empty()
+    model_results, pred_val = '', 0
     filter_list = available_tables['tracts'] + available_tables['block_groups']
+
     context = {'cols':json.dumps(list(DataProfileVars.objects.filter(group__in=filter_list).values()))}
     context['plot_div'], context['model_results'], context['pred_val'] = plot_div, model_results, pred_val
-
     if request.method == "POST":
+        
         cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],'var_ind_desc': request.POST['var_ind_desc'],
                      'table_dep': request.POST['table_dep'], 'var_dep': request.POST['var_dep'], 'var_dep_desc': request.POST['var_dep_desc'],
                      'ind_var_val': request.POST['ind_var_val'], 'year': request.POST['year'],'state': request.POST['state']}
-        # need to convert state name to code
+
         vals_ind = model_dict[cats_dict['table_ind']].objects.filter(state=cats_dict['state']).values(cats_dict['var_ind'])
         vals_dep = model_dict[cats_dict['table_dep']].objects.filter(state=cats_dict['state']).values(cats_dict['var_dep'])
+        
         vals_ind_list, vals_dep_list = [], []
-
         for x in vals_ind:
             vals_ind_list.append(Decimal(x[cats_dict['var_ind']]))
         for x in vals_dep:
@@ -293,27 +290,22 @@ def advancedanalysis(request):
         df['var_dep'] = vals_dep_list
         df = df[df['var_ind']>=0]
         df = df[df['var_dep']>=0]
-
-        # xlab = cats_dict['var_ind'][cats_dict['var_ind'].find(':')+1:]
-        # ylab = cats_dict['var_dep'][cats_dict['var_dep'].find(':')+1:]
+        
         plot_results = return_graph(df, 'var_ind', 'var_dep', '% "'+cats_dict['var_ind_desc']+'"', '% "'+cats_dict['var_dep_desc']+'"', cats_dict['ind_var_val'])
         context['plot_div'], context['model_results'], context['pred_val'] = plot_results[0], plot_results[1], round(plot_results[2],1)
         context['input_val'], context['input_var'], context['pred_var'] = int(cats_dict['ind_var_val']), cats_dict['var_ind_desc'], cats_dict['var_dep_desc']
+        
         return render(request, 'advancedanalysis.html', context)
-
+        
     return render(request, 'advancedanalysis.html', context)
 
 
 #For census advanced analysis app
 def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
-    if var_ind == 'x':
-        fig = px.scatter(df, x = var_ind, y=var_dep,trendline="ols",
-        labels={var_ind:xlab, var_dep:ylab}).update_layout(title_x=0.5)
 
-    else:
-        split_text = textwrap.wrap(ylab + ' by ') + textwrap.wrap(xlab)
-        fig = px.scatter(df, x = var_ind, y=var_dep,trendline="ols",
-        labels={var_ind:xlab, var_dep:ylab}, title= '<br>'.join(split_text)).update_layout(title_x=0.5)
+    split_text = textwrap.wrap(ylab + ' by ') + textwrap.wrap(xlab)
+    fig = px.scatter(df, x = var_ind, y=var_dep,trendline="ols",
+    labels={var_ind:xlab, var_dep:ylab}, title= '<br>'.join(split_text)).update_layout(title_x=0.5)
 
     fig.update_layout(
     title_font_family="Arial",
@@ -322,51 +314,51 @@ def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
     title={
         'xanchor': 'center',
         'yanchor': 'top'})
-
     results = px.get_trendline_results(fig)
-    if len(results) > 0:
-        results = results.px_fit_results.iloc[0].summary()
+    results = results.px_fit_results.iloc[0].summary()
 
-        fig.update_layout(showlegend=True)
-        fig.update_layout(
-            legend=dict(
-                x=0,y=1,
-                traceorder="normal",
-                font=dict(
-                    family="sans-serif",
-                    size=12,
-                    color="Black"
-                ),
-                bgcolor="LightSteelBlue",
-                bordercolor="dimgray",
-                borderwidth=2
-            ))
+    fig.update_layout(showlegend=True)
+    fig.update_layout(
+        legend=dict(
+            x=0,y=1,
+            traceorder="normal",
+            font=dict(
+                family="sans-serif",
+                size=12,
+                color="Black"
+            ),
+            bgcolor="LightSteelBlue",
+            bordercolor="dimgray",
+            borderwidth=2
+        ))
 
-        # retrieve model estimates
-        model = px.get_trendline_results(fig)
-        alpha = model.iloc[0]["px_fit_results"].params[0]
-        beta = model.iloc[0]["px_fit_results"].params[1]
+    # retrieve model estimates
+    model = px.get_trendline_results(fig)
+    alpha = model.iloc[0]["px_fit_results"].params[0]
+    beta = model.iloc[0]["px_fit_results"].params[1]
 
-        # restyle figure
-        fig.data[0].name = 'Tracts/Block Groups'
-        fig.data[0].showlegend = True
-        fig.data[1].name = fig.data[1].name  + ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
-        fig.data[1].showlegend = True
-        pred_val = alpha + beta*int(ind_var_val)
-        # addition for r-squared
-        rsq = model.iloc[0]["px_fit_results"].rsquared
-        fig.add_trace(go.Scatter(x=[max(var_ind)], y=[max(var_ind)],
-                                name = "R-squared" + ' = ' + str(round(rsq, 2)),
-                                showlegend=True,
-                                mode='markers',
-                                marker=dict(color='rgba(0,0,0,0)')
-                                ))
+    # restyle figure
+    fig.data[0].name = 'Tracts/Block Groups'
+    fig.data[0].showlegend = True
+    fig.data[1].name = fig.data[1].name  + ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
+    fig.data[1].showlegend = True
+    pred_val = alpha + beta*int(ind_var_val)
+    # addition for r-squared
+    rsq = model.iloc[0]["px_fit_results"].rsquared
+    fig.add_trace(go.Scatter(x=[max(var_ind)], y=[max(var_ind)],
+                            name = "R-squared" + ' = ' + str(round(rsq, 2)),
+                            showlegend=True,
+                            mode='markers',
+                            marker=dict(color='rgba(0,0,0,0)')
+                            ))
 
-    else:
-        results = ''
-        pred_val = 0
     plot_div = plot(fig,output_type='div',include_plotlyjs=False, show_link=False, link_text="")
+
     return plot_div, results, pred_val
 
+def return_graph_empty():
+    fig = px.scatter(pd.DataFrame({},columns=['x','y']),x='x',y='y').update_layout(title_x=0.5)
+    plot_div = plot(fig,output_type='div',include_plotlyjs=False, show_link=False, link_text="")
 
+    return plot_div
 

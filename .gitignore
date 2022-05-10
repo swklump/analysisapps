@@ -4,3 +4,4 @@
 /_testfiles/*
 /_modeltables
 /_queries
+/analysisapps/config.py

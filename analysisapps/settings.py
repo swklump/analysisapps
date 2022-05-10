@@ -1,5 +1,7 @@
 from pathlib import Path
 import os
+from analysisapps.config import get_config_dict
+config_dict = get_config_dict()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,10 +11,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-89mpn)n0sv##4sa4&mf$vubee+iffwyw8pr4@5@@t4olrq0q1('
+SECRET_KEY = config_dict['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = False
 ALLOWED_HOSTS = ['*']
 
@@ -62,33 +64,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'analysisapps.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# python anywhere postgres
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'anhcsurvey',
-#         'USER': 'swklump',
-#         'PASSWORD':'AnhCSuRVEy2O21',
-#         'HOST':'swklump-2473.postgres.pythonanywhere-services.com',
-#         'PORT':'12473',
-#     }
-# }
+# pythonanywhere connection
+DATABASES = config_dict['DATABASES_PROD']
 
-# local postgres
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'analysisapps',
-        'USER': 'postgres',
-        'PASSWORD':'Thinktank12',
-        'HOST':'localhost',
-        'PORT':'5432',
-    }
-}
+# local connection
+# DATABASES = config_dict['DATABASES_LOCAL']
 
 
 # Password validation

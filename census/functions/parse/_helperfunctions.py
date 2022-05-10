@@ -6,10 +6,10 @@ def get_location_id(sheet, num_cols):
     index_estimate = []
     
     for n in range(num_cols):
-        if sheet.cell_value(1, n) != 'Estimate':
+        if sheet.cell_value(0, n) == '':
             pass
         else:
-            locations_unprocessed.append(sheet.cell_value(2, n)[:-10]) # remove "!!Estimate"
+            locations_unprocessed.append(sheet.cell_value(0, n))
             index_estimate.append(n)
 
     # Import lookup table as df
