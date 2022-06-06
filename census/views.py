@@ -118,14 +118,14 @@ def parse(request):
             table_ids.append(table_id)
             years.append(year)
         # General exception error
-        # try:
-        buf = parse_func(wbs, table_ids, years)
-        buf.seek(0)
-        # except Exception:
-        #     messages.error(request, f'Please check that the uploaded file(s) were not edited after downloading from the '
-        #                             f'US Census website. If the error persists, please send an email to Sam Klump at '
-        #                             f'sam.klump@outlook.com.')
-            # return render(request, 'parse-error.html')
+        try:
+            buf = parse_func(wbs, table_ids, years)
+            buf.seek(0)
+        except Exception:
+            messages.error(request, f'Please check that the uploaded file(s) were not edited after downloading from the '
+                                    f'US Census website. If the error persists, please send an email to Sam Klump at '
+                                    f'sam.klump@outlook.com.')
+            return render(request, 'parse-error.html')
 
         response = StreamingHttpResponse(buf,content_type="application/zip")
         response['Content-Disposition'] = 'attachment; filename="census_parsed_files.zip"'
