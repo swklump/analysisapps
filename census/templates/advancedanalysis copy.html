@@ -1,0 +1,351 @@
+{% extends "_base.html" %} {% load static %} {% block content %}
+
+<!-- Being dumb. we need to do an ajax call to the django model, not connect to a pg database -->
+<!-- https://www.geeksforgeeks.org/handling-ajax-request-in-django/ -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{% static '/js/census-advancedanalysis.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    
+    <!-- Reload previous selections from sessions storage -->
+    <!-- <script type="text/javascript">
+      window.onload = function () {
+
+        // Tract-Blockgroup, independent variable value, year, and state
+        var selItem = localStorage.getItem("tr_bg_key");
+        $("#tr_bg").val(selItem);
+        var selItem = localStorage.getItem("ind_var_val_key");
+        $("#ind_var_val").val(selItem);
+        var selItem = localStorage.getItem("year_key");
+        $("#year").val(selItem);
+        var selItem = localStorage.getItem("state_key");
+        $("#state").val(selItem);
+
+        // Load table selections
+        var tab_ind = localStorage.getItem("table_ind_key");
+        var tab_dep = localStorage.getItem("table_dep_key");
+        if (localStorage.getItem("tr_bg_key") !== null && localStorage.getItem("tr_bg_key") !=='') {
+          populate_tables("tr_bg",'table_ind','cat_ind','var_ind','table_dep','cat_dep','var_dep');
+
+          // Independent Variable
+          if (tab_ind !== null && tab_ind !== '') {
+            $("#table_ind").val(tab_ind);
+
+            /// Load category selection
+            var s2 = document.getElementById("cat_ind");
+            var cats = localStorage.getItem("cat_ind_key_list");
+            var cats_array = cats.split('`');
+            var newOption = document.createElement('option');
+            newOption.value = '';
+            newOption.innerHTML = 'Select a category...';
+            s2.options.add(newOption);
+            for (i in cats_array){
+              var newOption = document.createElement('option');
+              newOption.value = cats_array[i];
+              newOption.innerHTML = cats_array[i];
+              s2.options.add(newOption);
+            };
+
+            var cat_ind = localStorage.getItem("cat_ind_key");
+            if (cat_ind !== null) {
+              $("#cat_ind").val(cat_ind);
+              /// Load variable selection
+              var s2 = document.getElementById("var_ind");
+              var vars = localStorage.getItem("var_ind_key_list");
+              var vars_array = vars.split('`');
+              var vars_html = localStorage.getItem("var_ind_key_list_html");
+              var vars_html_array = vars_html.split('`');
+              var newOption = document.createElement('option');
+              newOption.value = '';
+              newOption.innerHTML = 'Select a variable...';
+              s2.options.add(newOption);
+              for (i in vars_array){
+                var newOption = document.createElement('option');
+                newOption.value = vars_array[i];
+                newOption.innerHTML = vars_html_array[i];
+                s2.options.add(newOption);
+              };
+            }
+
+            var var_ind = localStorage.getItem("var_ind_key");
+            var var_ind_desc = localStorage.getItem("var_ind_key_html");
+            if (var_ind !== null) {
+              $("#var_ind").val(var_ind);
+              $("#var_ind_desc").val(var_ind_desc);
+            };
+          }
+          
+          // Dependent Variable
+          if (tab_dep !== null && tab_dep !== '') {
+            $("#table_dep").val(tab_dep);
+
+            /// Load category selection
+            var s2 = document.getElementById("cat_dep");
+            var cats = localStorage.getItem("cat_dep_key_list");
+            var cats_array = cats.split('`');
+            var newOption = document.createElement('option');
+            newOption.value = '';
+            newOption.innerHTML = 'Select a category...';
+            s2.options.add(newOption);
+            for (i in cats_array){
+              var newOption = document.createElement('option');
+              newOption.value = cats_array[i];
+              newOption.innerHTML = cats_array[i];
+              s2.options.add(newOption);
+            };
+
+            var cat_dep = localStorage.getItem("cat_dep_key");
+            if (cat_dep !== null) {
+              $("#cat_dep").val(cat_dep);
+              /// Load variable selection
+              var s2 = document.getElementById("var_dep");
+              var vars = localStorage.getItem("var_dep_key_list");
+              var vars_array = vars.split('`');
+              var vars_html = localStorage.getItem("var_dep_key_list_html");
+              var vars_html_array = vars_html.split('`');
+              var newOption = document.createElement('option');
+              newOption.value = '';
+              newOption.innerHTML = 'Select a variable...';
+              s2.options.add(newOption);
+              for (i in vars_array){
+                var newOption = document.createElement('option');
+                newOption.value = vars_array[i];
+                newOption.innerHTML = vars_html_array[i];
+                s2.options.add(newOption);
+              };
+            }
+
+            var var_dep = localStorage.getItem("var_dep_key");
+            var var_dep_desc = localStorage.getItem("var_dep_key_html");
+            if (var_dep !== null) {
+              $("#var_dep").val(var_dep);
+              $("#var_dep_desc").val(var_dep_desc);
+            };
+          }
+        }
+
+        else {
+          var items = ['table_ind_key','table_dep_key','cat_ind_key','cat_ind_key_list','cat_dep_key','cat_dep_key_list',
+          'var_ind_key','var_ind_key_html','var_ind_key_list','var_ind_key_list_html',
+          'var_dep_key','var_dep_key_html','var_dep_key_list','var_dep_key_list_html']
+          for (x in items) {}
+          localStorage.removeItem(items[x])
+        }
+      };
+    </script> -->
+
+    <style>
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row align-items-top my-5">
+
+        <!-- Left Column -->
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <p></p>
+          <h2 class="font-weight-light">Census Data App</h2>
+          This application parses and analyzes data from the US Census Bureau
+          website.
+          <p></p>
+          <h4 class="font-weight-light">Module 3. Advanced Statistical Analysis</h4>
+          
+          <a href="https://youtu.be/DIO3Kh7kCSs">Click here</a> for a
+          video demonstration of the Census Data App.
+          <p></p>
+          <form method="POST" enctype="multipart/form-data" class="form-inline">
+            {% csrf_token %}
+            <i>Tract or Block Group</i>
+            <!-- Select Tract or Block Group -->
+            <select name="tr_bg" id="tr_bg" class="form-select form-select-sm" onchange="populate_tables(this.id,'table_ind','cat_ind','var_ind','table_dep','cat_dep','var_dep')">
+              <option value="">Select an option...</option>
+              <option value="tract">Tract</option>
+              <option value="blockgroup">Block Group</option>
+            </select>
+            <p></p>
+
+            <li>Independent Variable</li>
+
+            <select name="table_ind" id="table_ind" class="form-select form-select-sm" onchange="populate_cat(this.id,'cat_ind','var_ind','{{cols}}')">
+            </select>
+            <p></p>
+
+            <select name="cat_ind" id='cat_ind' class="form-select form-select-sm" onchange="populate_var(this.id,'var_ind','table_ind','{{cols}}')">
+            </select>
+            <p></p>
+
+            <select name="var_ind" id='var_ind' class="form-select form-select-sm" onchange="set_session_var(this.id, 'var_ind_desc')">
+            </select>
+            <p></p>
+
+            <input
+            type="hidden"
+            name="var_ind_desc"
+            id="var_ind_desc"
+            style="width: 300"
+            />
+
+
+          <li>Dependent Variable</li>
+            <select name="table_dep" id="table_dep" class="form-select form-select-sm" onchange="populate_cat(this.id,'cat_dep','var_dep','{{cols}}')">
+            </select>
+            <p></p>
+
+            <select name="cat_dep" id='cat_dep' class="form-select form-select-sm" onchange="populate_var(this.id,'var_dep','table_dep','{{cols}}')">
+            </select>
+            <p></p>
+
+            <select name="var_dep" id='var_dep' class="form-select form-select-sm" onchange="set_session_var(this.id, 'var_dep_desc')">
+            </select>
+            <p></p>
+
+            <input
+            type="hidden"
+            name="var_dep_desc"
+            id="var_dep_desc"
+            style="width: 300"
+            />
+
+            <li>Enter the independent variable value (%)</li>
+            <div class="input-group input-group-sm mb-3" style="width: 150px">
+              <span class="input-group-text" id="inputGroup-sizing-sm">%</span>
+              <input type="number" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm"
+              id="ind_var_val" name="ind_var_val" min="0" max="100"
+              onchange="set_session_var_indval(this.id)"
+              required="required">
+            </div>
+            <p></p>
+
+            <li>Select the year and state</li>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-6">
+                <select
+                  class="form-select form-select-sm"
+                  name="year"
+                  id="year"
+                  onchange="set_session_var_indval(this.id)"
+                  required="required">
+                  <option value="">Select a year...</option>
+                  <option value="2019">2019</option>
+                  <!-- <option value="2018">2018</option>
+                  <option value="2017">2017</option>
+                  <option value="2016">2016</option>
+                  <option value="2015">2015</option>
+                  <option value="2014">2014</option>
+                  <option value="2013">2013</option>
+                  <option value="2012">2012</option>
+                  <option value="2011">2011</option>
+                  <option value="2010">2010</option> -->
+                </select>
+              </div>
+              <div class="col-xs-12 col-sm-12 col-md-6">
+                <select
+                  class="form-select form-select-sm"
+                  name="state"
+                  id="state"
+                  onchange="set_session_var_indval(this.id)"
+                  required="required">
+                <option value="">Select a state...</option>
+                <option value="01">Alabama</option>
+                <option value="02">Alaska</option>
+                <option value="04">Arizona</option>
+                <option value="05">Arkansas</option>
+                <option value="06">California</option>
+                <option value="08">Colorado</option>
+                <option value="09">Connecticut</option>
+                <option value="10">Delaware</option>
+                <option value="11">District Of Columbia</option>
+                <option value="12">Florida</option>
+                <option value="13">Georgia</option>
+                <option value="15">Hawaii</option>
+                <option value="16">Idaho</option>
+                <option value="17">Illinois</option>
+                <option value="18">Indiana</option>
+                <option value="19">Iowa</option>
+                <option value="20">Kansas</option>
+                <option value="21">Kentucky</option>
+                <option value="22">Louisiana</option>
+                <option value="23">Maine</option>
+                <option value="24">Maryland</option>
+                <option value="25">Massachusetts</option>
+                <option value="26">Michigan</option>
+                <option value="27">Minnesota</option>
+                <option value="28">Mississippi</option>
+                <option value="29">Missouri</option>
+                <option value="30">Montana</option>
+                <option value="31">Nebraska</option>
+                <option value="32">Nevada</option>
+                <option value="33">New Hampshire</option>
+                <option value="34">New Jersey</option>
+                <option value="35">New Mexico</option>
+                <option value="36">New York</option>
+                <option value="37">North Carolina</option>
+                <option value="38">North Dakota</option>
+                <option value="39">Ohio</option>
+                <option value="40">Oklahoma</option>
+                <option value="41">Oregon</option>
+                <option value="42">Pennsylvania</option>
+                <option value="44">Rhode Island</option>
+                <option value="45">South Carolina</option>
+                <option value="46">South Dakota</option>
+                <option value="47">Tennessee</option>
+                <option value="48">Texas</option>
+                <option value="49">Utah</option>
+                <option value="50">Vermont</option>
+                <option value="51">Virginia</option>
+                <option value="53">Washington</option>
+                <option value="54">West Virginia</option>
+                <option value="55">Wisconsin</option>
+                <option value="56">Wyoming</option>
+                </select>
+              </div>
+            </div>
+            <p></p>
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+          </form>
+          </li>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <div class="row">
+            <div style="width:700px;height:600px">
+              {% autoescape off %}
+              {{ plot_div }}
+              {% endautoescape %}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-1"></div>
+            <div class="col-11">
+              <div>
+                <u>Input value:</u>  {{ input_val }}% "{{input_var}}"<br>
+                <u>Predicted value:</u>  {{ pred_val }}% "{{pred_var}}""
+              </div>
+            </div>
+          </div>
+          <p></p>
+          <div class="row">
+            <div class="col-1"></div>
+            <div class="col-11">
+              <div>
+                <small>{{ model_results }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>
+
+{% endblock content %}

@@ -3,24 +3,40 @@
 <html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
-    <script src="{% static '/js/traffic-tam.js' %}"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" type="text/css"/>
+    <script src="{% static '/js/traffic-tam.js' %}" type="text/javascript"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js" type="text/javascript"></script>></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" type="text/javascript"></script>></script>
 
     <script type="text/javascript">
       window.onload = function () {
 
         // Load session vars
         var selItem = localStorage.getItem("outputtype_key");
-        if (selItem == null) {
+        var selItem_quantiles = localStorage.getItem("quantiles_key");
+        if (selItem == null | selItem == 'table') {
           $("#outputtype").val("table");
         }
         else {
           $("#outputtype").val(selItem);
+          var s1 = document.getElementById('category');
+          s1.style.display = 'block';
+          if (selItem_quantiles){
+            $("#quantiles").val(selItem_quantiles);
+          }
+          else{
+            $("#quantiles").val('');
+          }
         }
       };
     </script>
+
+    <style>
+    #category {
+          display: none;
+        }
+    </style>
+    
   </head>
 
   <body>
@@ -46,10 +62,22 @@
 
             <li>Step 3:</li>
             Select the output type.
-            <select class="form-select form-select-sm" name="outputtype" id="outputtype"  onchange="set_session_var(this.id)">
+            <select class="form-select form-select-sm" name="outputtype" id="outputtype"  onchange="set_session_var(this.id); show_category_div(this.id,'category')">
               <option value="table">Tables (Excel)</option>
               <option value="map">Interactive Map</option>
             </select>
+            <p></p>
+
+            <div id="category">
+              <li>Step 4:</li>
+              Select how to categorize the predicted volumes.
+              <select class="form-select form-select-sm" name="quantiles" id="quantiles" onchange="set_session_var(this.id)" required>
+                <option value="">Select an option...</option>
+                <option value="deciles">Deciles (every 10%)</option>
+                <option value="quintiles">Quintiles (every 20%)</option>
+                <option value="quartiles">Quartiles (every 25%)</option>
+              </select>
+            </div>
 
             <p></p>
             <button class="btn btn-primary" type="submit">Submit</button>

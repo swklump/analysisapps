@@ -1,4 +1,4 @@
-def tam_func(uploaded_file):
+def tam_func(uploaded_file, quantiles_select):
 
     import pandas as pd
     pd.options.mode.chained_assignment = None
@@ -159,24 +159,27 @@ def tam_func(uploaded_file):
     dict_map['trips'] =  [int(ele) for ele in link_vols['trips_allhours'] for i in range(2)]
     dict_map['lat'], dict_map['lon'], dict_map['cat']= [], [], []
 
-    # Categorize trips by quintiles
-    min_val = int(min(link_vols['trips_allhours']))
-    first = int(np.quantile(link_vols['trips_allhours'],0.2))
-    second = int(np.quantile(link_vols['trips_allhours'],0.4))
-    third = int(np.quantile(link_vols['trips_allhours'],0.6))
-    fourth = int(np.quantile(link_vols['trips_allhours'],0.8))
-    max_val = int(max(link_vols['trips_allhours']))
-    for x in range(len(dict_map['trips'])):
-        if dict_map['trips'][x] < first:
-            dict_map['cat'].append(str(min_val)+'-'+str(first))
-        elif dict_map['trips'][x] < second:
-            dict_map['cat'].append(str(first)+'-'+str(second))
-        elif dict_map['trips'][x] < third:
-            dict_map['cat'].append(str(second)+'-'+str(third))
-        elif dict_map['trips'][x] < fourth:
-            dict_map['cat'].append(str(third)+'-'+str(fourth))
+    cat_select_dict = {'deciles':10,'quintiles':5,'quartiles':4}
+    cat_maxmin = {}
+    for x in range(cat_select_dict[quantiles_select]):
+        if x == 0:
+            cat_max = np.quantile(link_vols['trips_allhours'],1/cat_select_dict[quantiles_select]*(x+1))
+            cat_min = 0
+            cat_maxmin["{:,}".format(int(cat_min)) + ' - ' + "{:,}".format(int(cat_max))] = [cat_min,cat_max]
+        elif x == cat_select_dict[quantiles_select] - 1:
+            cat_max = max(link_vols['trips_allhours'])
+            cat_min = np.quantile(link_vols['trips_allhours'],1/cat_select_dict[quantiles_select]*(x))
+            cat_maxmin["{:,}".format(int(cat_min)) + ' - ' + "{:,}".format(int(cat_max))] = [cat_min,cat_max]
         else:
-            dict_map['cat'].append(str(fourth)+'-'+str(max_val))
+            cat_max = np.quantile(link_vols['trips_allhours'],1/cat_select_dict[quantiles_select]*(x+1))
+            cat_min = np.quantile(link_vols['trips_allhours'],1/cat_select_dict[quantiles_select]*(x))
+            cat_maxmin["{:,}".format(int(cat_min)) + ' - ' + "{:,}".format(int(cat_max))] = [cat_min,cat_max]
+    
+    for x in range(len(dict_map['trips'])):
+        for k,v in cat_maxmin.items():
+            if dict_map['trips'][x] <= v[1]:
+                dict_map['cat'].append(k)
+                break
 
     # reformat to have each line point as own row
     for x in range(len(dict_map['link_num'])):

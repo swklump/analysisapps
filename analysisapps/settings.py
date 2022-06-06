@@ -18,6 +18,10 @@ DEBUG = True
 TEMPLATE_DEBUG = False
 ALLOWED_HOSTS = ['*']
 
+if DEBUG:
+    import mimetypes
+    mimetypes.add_type("text/javascript", ".js", True)
+
 
 # Application definition
 

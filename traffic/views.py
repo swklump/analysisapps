@@ -117,10 +117,6 @@ def ihsdm(request):
 ### TRIP ASSIGNMENT MODEL
 @csrf_exempt
 def tam(request):
-    # dummy variables for map
-    # dict_lines = {'link_num':['','','','',''],'lat':['','','','',''], 'lon':['','','','',''],'trips':['','','','',''], 'cat':['1','2','3','4','5']}
-    # df = pd.DataFrame(dict_lines)
-    # plot_div = return_graph_tam(df)
 
     if request.method == "POST":
 
@@ -130,7 +126,13 @@ def tam(request):
         if uploaded_file.name[-5:] != '.xlsx':
             messages.error(request, f'Please upload an Excel (.xlsx) file.')
             return render(request, 'tam/tam-error.html')
-        func_results = tam_func(uploaded_file)
+        
+        if outputtype == 'map':
+            quantiles_select = request.POST['quantiles']
+        else:
+            quantiles_select = 'quintiles'
+        
+        func_results = tam_func(uploaded_file, quantiles_select)
         buf, df_map = func_results[0], func_results[1]
         buf.seek(0)
 
@@ -139,7 +141,7 @@ def tam(request):
             response['Content-Disposition'] = 'attachment; filename="tam_outputtables.zip"'
             return response
         elif outputtype == 'map':
-            plot_div = return_graph_tam(df_map)
+            plot_div = return_graph_tam(df_map, quantiles_select)
             return render(request, 'tam/tam.html', context={'plot_div': plot_div, 'email':email_master, 'email_link':email_href})
 
         # except Exception:
@@ -148,77 +150,12 @@ def tam(request):
     return render(request, 'tam/tam.html', context={'email':email_master, 'email_link':email_href})
 
 
-#For census advanced analysis app
-def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
-    if var_ind == 'x':
-        fig = px.scatter(df, x = var_ind, y=var_dep,trendline="ols",
-        labels={var_ind:xlab, var_dep:ylab}).update_layout(title_x=0.5)
-
-    else:
-        split_text = textwrap.wrap(ylab + ' by ') + textwrap.wrap(xlab)
-        fig = px.scatter(df, x = var_ind, y=var_dep,trendline="ols",
-        labels={var_ind:xlab, var_dep:ylab}, title= '<br>'.join(split_text)).update_layout(title_x=0.5)
-
-    fig.update_layout(
-    title_font_family="Arial",
-    )
-    fig.update_layout(
-    title={
-        'xanchor': 'center',
-        'yanchor': 'top'})
-
-    results = px.get_trendline_results(fig)
-    if len(results) > 0:
-        results = results.px_fit_results.iloc[0].summary()
-
-        fig.update_layout(showlegend=True)
-        fig.update_layout(
-            legend=dict(
-                x=0,y=1,
-                traceorder="normal",
-                font=dict(
-                    family="sans-serif",
-                    size=12,
-                    color="Black"
-                ),
-                bgcolor="LightSteelBlue",
-                bordercolor="dimgray",
-                borderwidth=2
-            ))
-
-        # retrieve model estimates
-        model = px.get_trendline_results(fig)
-        alpha = model.iloc[0]["px_fit_results"].params[0]
-        beta = model.iloc[0]["px_fit_results"].params[1]
-
-        # restyle figure
-        fig.data[0].name = 'Tracts/Block Groups'
-        fig.data[0].showlegend = True
-        fig.data[1].name = fig.data[1].name  + ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
-        fig.data[1].showlegend = True
-        pred_val = alpha + beta*int(ind_var_val)
-        # addition for r-squared
-        rsq = model.iloc[0]["px_fit_results"].rsquared
-        fig.add_trace(go.Scatter(x=[max(var_ind)], y=[max(var_ind)],
-                                name = "R-squared" + ' = ' + str(round(rsq, 2)),
-                                showlegend=True,
-                                mode='markers',
-                                marker=dict(color='rgba(0,0,0,0)')
-                                ))
-
-    else:
-        results = ''
-        pred_val = 0
-    plot_div = plot(fig,output_type='div',include_plotlyjs=False, show_link=False, link_text="")
-    return plot_div, results, pred_val
-
 #For tam app
-def return_graph_tam(df):
+def return_graph_tam(df, quantiles_select):
     plotly.express.set_mapbox_access_token('pk.eyJ1Ijoic3drbHVtcCIsImEiOiJja3Z4MGk0aTYwaGlrMnBubzYyeXA2bW91In0.UmjBh9eSwNC8BJ0p5MRF-w')
     df = df.sort_values(['trips'],ascending=True)
     uniquevals = df['cat'].unique()
     fig = px.line_mapbox(df, lat="lat", lon="lon", color="cat",line_group="link_num",
-    color_discrete_map = {uniquevals[0]:'green',uniquevals[1]:'yellow',uniquevals[2]:'orange',uniquevals[3]:'red',uniquevals[4]:'black',},
     center = {"lat":  61.565, "lon":-149.52}, zoom=10.5,
     mapbox_style="open-street-map",
     labels={'trips_perday':'Volumes'},
@@ -239,7 +176,7 @@ def return_graph_tam(df):
         y=-0.08,
         xanchor="left",
         x=0,
-        title=dict(text="Modeled Trips (quintiles)")
+        title=dict(text=f"Modeled Trips ({quantiles_select})")
     ))
 
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
