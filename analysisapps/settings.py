@@ -14,7 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = config_dict['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = False
 ALLOWED_HOSTS = ['*']
 
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'analysisapps',
     'census',
     'traffic',
@@ -39,9 +40,10 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'analysisapps.urls'
@@ -68,10 +70,10 @@ WSGI_APPLICATION = 'analysisapps.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 # pythonanywhere connection
-DATABASES = config_dict['DATABASES_PROD']
+# DATABASES = config_dict['DATABASES_PROD']
 
 # local connection
-# DATABASES = config_dict['DATABASES_LOCAL']
+DATABASES = config_dict['DATABASES_LOCAL']
 
 
 # Password validation
@@ -92,6 +94,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+INTERNAL_IPS = [
+    "127.0.0.1:8000",
+    "127.0.0.1",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

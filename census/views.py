@@ -63,6 +63,7 @@ def parse(request):
         wbs = []
         table_ids = []
         years = []
+        table_ids_year = []
         for census_file in fnames:
 
             # Check if file is an Excel file
@@ -106,24 +107,25 @@ def parse(request):
                                f'to be added to the app, please send an email to Sam Klump at sam.klump@outlook.com.')
                 return render(request, 'parse-error.html')
 
+            # Add table id to list
+            table_ids_year.append(table_id + '_' + str(year))
             # Check for duplicates
-            if len(table_ids) != len(set(table_ids)):
+            if len(table_ids_year) != len(set(table_ids_year)):
                 messages.error(request,
                                f'There is a duplicate Census table file in the zipped folder. Please remove the duplicate table and try again.')
                 return render(request, 'parse-error.html')
             wbs.append(wb)
             table_ids.append(table_id)
             years.append(year)
-
         # General exception error
-        try:
-            buf = parse_func(wbs, table_ids, years)
-            buf.seek(0)
-        except Exception:
-            messages.error(request, f'Please check that the uploaded file(s) were not edited after downloading from the '
-                                    f'US Census website. If the error persists, please send an email to Sam Klump at '
-                                    f'sam.klump@outlook.com.')
-            return render(request, 'parse-error.html')
+        # try:
+        buf = parse_func(wbs, table_ids, years)
+        buf.seek(0)
+        # except Exception:
+        #     messages.error(request, f'Please check that the uploaded file(s) were not edited after downloading from the '
+        #                             f'US Census website. If the error persists, please send an email to Sam Klump at '
+        #                             f'sam.klump@outlook.com.')
+            # return render(request, 'parse-error.html')
 
         response = StreamingHttpResponse(buf,content_type="application/zip")
         response['Content-Disposition'] = 'attachment; filename="census_parsed_files.zip"'
@@ -271,6 +273,7 @@ def advancedanalysis(request):
 
     context = {'cols':json.dumps(list(DataProfileVars.objects.filter(group__in=filter_list).values()))}
     context['plot_div'], context['model_results'], context['pred_val'] = plot_div, model_results, pred_val
+    # context = {}
     if request.method == "POST":
         
         cats_dict = {'table_ind': request.POST['table_ind'], 'var_ind': request.POST['var_ind'],'var_ind_desc': request.POST['var_ind_desc'],
@@ -295,9 +298,9 @@ def advancedanalysis(request):
         context['plot_div'], context['model_results'], context['pred_val'] = plot_results[0], plot_results[1], round(plot_results[2],1)
         context['input_val'], context['input_var'], context['pred_var'] = int(cats_dict['ind_var_val']), cats_dict['var_ind_desc'], cats_dict['var_dep_desc']
         
-        return render(request, 'advancedanalysis.html', context)
+        return render(request, 'advancedanalysis copy.html', context)
         
-    return render(request, 'advancedanalysis.html', context)
+    return render(request, 'advancedanalysis copy.html', context)
 
 
 #For census advanced analysis app
@@ -357,7 +360,8 @@ def return_graph(df, var_ind, var_dep, xlab, ylab, ind_var_val):
     return plot_div, results, pred_val
 
 def return_graph_empty():
-    fig = px.scatter(pd.DataFrame({},columns=['x','y']),x='x',y='y').update_layout(title_x=0.5)
+    fig = go.Figure(data=[go.Scattergl(x = [], y = [], mode = 'markers')])
+    # fig = px.scatter(pd.DataFrame({},columns=['x','y']),x='x',y='y').update_layout(title_x=0.5)
     plot_div = plot(fig,output_type='div',include_plotlyjs=False, show_link=False, link_text="")
 
     return plot_div

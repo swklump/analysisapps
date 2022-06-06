@@ -32,7 +32,7 @@ def parse_func(wbs, table_ids, years):
 
     # Create zipped stream to add spreadsheet to
     buf = io.BytesIO()
-    zs = zipfile.ZipFile(buf, mode='w')
+    zs = zipfile.ZipFile('temp', mode='w')
 
     for x in range(len(wbs)):
 
@@ -75,33 +75,34 @@ def parse_func(wbs, table_ids, years):
                                              columns=['Detail','Value'])
                     df_detail.to_excel(writer, sheet_name='FileDetails', index=False)
         zfm.close()
+    
 
 
     ### Combine files with same name but different years
-    # get list of files in zipped folder, create unique set, create dictionary with count of each unique
-    # files = zs.namelist()
-    # unique_files = []
-    # for f in files:
-    #     unique_files.append(f[:-17])
-    # unique_files = set(unique_files)
-    #
-    # dict_files = {}
-    # for u in unique_files:
-    #     dict_files[u] = pd.DataFrame()
-    #
-    # for u in unique_files:
-    #     for f in files:
-    #         if u == f[:-17]:
-    #             if len(dict_files[u]) == 0:
-    #                 dict_files[u] = pd.read_excel(zs.open(f, 'r').read())
-    #             else:
-    #                 dict_files[u] = pd.concat([dict_files[u],pd.read_excel(zs.open(f, 'r').read())])
-    #
-    #     zfm1 = zs.open('test.xlsx', 'w')
-    #     with pd.ExcelWriter(zfm1, engine='xlsxwriter') as writer:
-    #         for k in dict_files.keys():
-    #             dict_files[k].to_excel(writer, sheet_name='test', index=False)
-    #     zfm1.close()
+    files = zs.namelist()
+
+    unique_files = [f[:-17] for f in files]
+    unique_files = set(unique_files)
+    
+    dict_files = {u:pd.DataFrame() for u in unique_files}
+    zs1 = zipfile.ZipFile(buf, mode='w')
+    for u in unique_files:
+        for f in files:
+            if u == f[:-17]:
+                if len(dict_files[u]) == 0:
+                    dict_files[u] = pd.read_excel(zs.open(f, 'r').read())
+                    tabname = pd.ExcelFile(zs.open(f, 'r').read()).sheet_names[0]
+                    df_sheet_name = pd.read_excel(zs.open(f, 'r').read(),sheet_name='FileDetails')
+            
+                else:
+                    dict_files[u] = pd.concat([dict_files[u],pd.read_excel(zs.open(f, 'r').read())])
+        zfm1 = zs1.open(f'{u}_parsed.xlsx', 'w')
+        with pd.ExcelWriter(zfm1, engine='xlsxwriter') as writer:
+            dict_files[u].to_excel(writer, sheet_name=tabname, index=False)
+            df_sheet_name.loc[df_sheet_name['Detail']=='Year','Value'] = ','.join([str(elem) for elem in dict_files[u]['year'].unique()])
+            df_sheet_name.to_excel(writer, sheet_name='FileDetails', index=False)
+        zfm1.close()
     zs.close()
+    zs1.close()
 
     return buf
